@@ -24,7 +24,7 @@
     "fuse.js": "^7.1.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.555.0",
-    "mongodb": "^7.0.0",
+    "mongodb": "^5.9.2",
     "next": "16.0.5",
     "next-auth": "^4.24.13",
     "react": "19.2.0",

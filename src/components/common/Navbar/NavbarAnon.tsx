@@ -8,8 +8,8 @@ export default function NavbarAnonymous() {
         SafeTrip Explorer
       </Link>
       <div className="space-x-4">
-        <Link href="/auth/login/login">Login</Link>
-        <Link href="/auth/register">Register</Link>
+        <Link href="/auth/login/">Login</Link>
+        <Link href="/auth/register/">Register</Link>
         <Link href="/spots">Explore</Link>
       </div>
     </nav>
