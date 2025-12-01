@@ -1,16 +1,16 @@
-// src/hooks/useAuthStore.ts
 import { create } from "zustand";
 
-interface User {
-  id: string;
+type User = {
+  _id: string;
   name: string;
-  role: string;
-}
+  email: string;
+  role: "user" | "admin" | "superadmin";
+};
 
 interface AuthStore {
   user: User | null;
   setUser: (user: User | null) => void;
-  logout: () => void;
+  logout: () => void; // <-- add this
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
