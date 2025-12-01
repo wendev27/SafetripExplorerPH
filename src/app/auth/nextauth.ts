@@ -1,12 +1,10 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import clientPromise from "@/lib/db";
 import { compare } from "bcryptjs";
-import { User } from "next-auth";
+import { connectDB } from "@/lib/db";
+import User from "@/services/models/User";
 
 export default NextAuth({
-  adapter: MongoDBAdapter(clientPromise),
   session: {
     strategy: "jwt",
   },
@@ -18,43 +16,34 @@ export default NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const client = await clientPromise;
-        const usersCollection = client.db().collection("users");
+        await connectDB();
 
-        const user = await usersCollection.findOne({
-          email: credentials?.email,
-        });
-        if (!user) {
-          throw new Error("No user found with this email");
-        }
+        const user = await User.findOne({ email: credentials?.email }).lean();
+        if (!user) throw new Error("No user found");
 
         const isValid = await compare(credentials!.password, user.password);
-        if (!isValid) {
-          throw new Error("Password is incorrect");
-        }
+        if (!isValid) throw new Error("Incorrect password");
 
-        // Return minimal user object
         return {
           id: user._id.toString(),
           name: user.name,
           email: user.email,
-          role: user.role,
-        } as User;
+          userRole: user.userRole,
+        };
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = user.role;
         token.id = user.id;
+        token.userRole = user.userRole;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token) {
-        // session.user = { ...session.user, id: token.id, role: token.role };
-      }
+      session.user.id ? token.id : null;
+      session.user.userRole = token.userRole;
       return session;
     },
   },

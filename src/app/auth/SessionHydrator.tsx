@@ -11,10 +11,10 @@ export default function SessionHydrator() {
   useEffect(() => {
     if (session?.user) {
       setUser({
-        _id: session.user.id, // string, always defined
-        name: session.user.name ?? "", // fallback if null
-        email: session.user.email ?? "", // fallback if null
-        role: session.user.role, // "user" | "admin" | "superadmin"
+        _id: session.user.id,
+        name: session.user.name ?? "",
+        email: session.user.email ?? "",
+        role: session.user.userRole ?? "user", // fallback
       });
     } else {
       setUser(null);
