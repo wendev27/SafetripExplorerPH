@@ -8,7 +8,7 @@ if (!MONGODB_URI) {
 
 let isConnected = false;
 
-export const connectDB = async () => {
+const connectDB = async () => {
   if (isConnected) return;
 
   try {
@@ -19,3 +19,5 @@ export const connectDB = async () => {
     console.error("❌ MongoDB Error:", error);
   }
 };
+
+export default connectDB;

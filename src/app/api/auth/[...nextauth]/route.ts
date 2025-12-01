@@ -1,7 +1,7 @@
 import NextAuth, { AuthOptions, DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
-import { connectDB } from "@/lib/db";
+import connectDB from "@/lib/db";
 import UserModel from "@/services/models/User";
 
 /**
