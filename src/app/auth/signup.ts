@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import clientPromise from "@/lib/db";
 import { hash } from "bcryptjs";
+import connectDB from "@/lib/db";
+import User from "@/services/models/User";
 
 export default async function handler(
   req: NextApiRequest,
@@ -15,26 +16,24 @@ export default async function handler(
     return res.status(400).json({ message: "Missing fields" });
 
   try {
-    const client = await clientPromise;
-    const db = client.db();
+    await connectDB();
 
-    const existingUser = await db.collection("users").findOne({ email });
+    const existingUser = await User.findOne({ email });
     if (existingUser)
       return res.status(400).json({ message: "User already exists" });
 
     const hashedPassword = await hash(password, 10);
 
-    const result = await db.collection("users").insertOne({
+    const newUser = await User.create({
       name,
       email,
       password: hashedPassword,
-      role: role || "user", // default role
-      createdAt: new Date(),
+      userRole: role || "user",
     });
 
     return res
       .status(201)
-      .json({ message: "User created", userId: result.insertedId });
+      .json({ message: "User created", userId: newUser._id });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Internal server error" });
