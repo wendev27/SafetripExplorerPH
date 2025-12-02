@@ -15,24 +15,27 @@ interface Spot {
 
 export default function HomePage() {
   const [spots, setSpots] = useState<Spot[]>([]);
+  const [loading, setLoading] = useState(true); // <-- Loading state
 
   useEffect(() => {
+    setLoading(true); // start loading
     fetch("/api/shared/spots")
       .then((res) => res.json())
-      .then((data) => setSpots(data.spots || [])) // avoid undefined
-      .catch(() => setSpots([]));
+      .then((data) => setSpots(data.data || [])) // data.data from your API
+      .catch(() => setSpots([]))
+      .finally(() => setLoading(false)); // stop loading
   }, []);
 
-  useEffect(() => {
-    fetch("/api/shared/spots")
-      .then((res) => res.json())
-      .then((data) => setSpots(data.data || [])); // <-- FIX HERE
-  }, []);
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold mb-6">Available Spots</h1>
 
-      {spots.length === 0 ? (
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          {/* Simple spinner */}
+          <div className="w-12 h-12 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+        </div>
+      ) : spots.length === 0 ? (
         <p>No spots available.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
