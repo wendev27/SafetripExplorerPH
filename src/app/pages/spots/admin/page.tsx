@@ -1,3 +1,5 @@
+// src/app/pages/spots/admin/page.tsx
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -35,7 +37,7 @@ export default function AdminAddSpotPage() {
         .map((a) => a.trim())
         .filter((a) => a !== "");
 
-      await axios.post("/api/admin/spots", {
+      await axios.post("/api/admin/spots/create/", {
         ...data,
         images,
         amenities,
