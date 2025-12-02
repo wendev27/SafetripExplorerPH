@@ -2,22 +2,16 @@ import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI!;
 
-if (!MONGODB_URI) {
-  throw new Error("❌ Missing MONGODB_URI in .env file");
-}
+if (!MONGODB_URI) throw new Error("Missing MONGODB_URI");
 
 let isConnected = false;
 
-const connectDB = async () => {
-  if (isConnected) return;
+export default async function connectDB() {
+  if (isConnected && mongoose.connection.readyState === 1) return;
 
-  try {
-    const db = await mongoose.connect(MONGODB_URI);
-    isConnected = db.connections[0].readyState === 1;
-    console.log("✅ MongoDB Connected");
-  } catch (error) {
-    console.error("❌ MongoDB Error:", error);
-  }
-};
+  await mongoose.connect(MONGODB_URI, {
+    dbName: "InfosecCluster",
+  });
 
-export default connectDB;
+  isConnected = true;
+}

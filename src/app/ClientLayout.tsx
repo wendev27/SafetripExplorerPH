@@ -14,7 +14,7 @@ export default function ClientLayout({
     <SessionProvider>
       <SessionHydrator />
       <Navbar />
-      <main className="flex-grow">{children}</main>
+      <main className="">{children}</main>
       <Footer />
     </SessionProvider>
   );

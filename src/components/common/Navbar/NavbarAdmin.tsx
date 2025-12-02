@@ -21,8 +21,8 @@ export default function NavbarAdmin() {
         <Link href="/logout"></Link>
       </div>
       <div className="space-x-4">
-        <Link href="/dashboard">Dashboard</Link>
-        <Link href="/spots">Manage Spots</Link>
+        <Link href="/pages/dashboard/admin">Dashboard</Link>
+        <Link href="/pages/spots/admin/">Manage Spots</Link>
         <Link href="/reviews">Manage Reviews</Link>
 
         <button

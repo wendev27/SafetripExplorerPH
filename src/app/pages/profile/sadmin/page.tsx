@@ -17,9 +17,7 @@ export default function ProfilePage() {
         <p className="mb-2">
           <strong>Email:</strong> {session?.user?.email}
         </p>
-        <p className="mb-2">
-          <strong>Email:</strong> {session?.user?.userRole}
-        </p>
+
         <Link
           href="/pages/profile/user/update"
           className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
