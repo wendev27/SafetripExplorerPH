@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const loginSchema = z.object({
@@ -31,7 +32,7 @@ export default function LoginPage() {
     if (res?.error) {
       setError(res.error);
     } else {
-      router.push("/"); // redirect after login
+      router.push("/");
     }
   };
 
@@ -70,6 +71,13 @@ export default function LoginPage() {
         >
           Login
         </button>
+
+        <p className="mt-4 text-center text-sm text-gray-600">
+          Wanna register?{" "}
+          <Link href="/auth/register" className="text-blue-600 hover:underline">
+            Create an account
+          </Link>
+        </p>
       </form>
     </div>
   );

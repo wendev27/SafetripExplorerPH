@@ -22,7 +22,7 @@ export default function NavbarUser() {
       </Link>
       <div className="space-x-4">
         <Link href="/spots">Explore</Link>
-        <Link href="/profile">My Profile</Link>
+        <Link href="/pages/profile/user">My Profile</Link>
         <button
           onClick={handleLogout}
           className="text-white hover:text-gray-200"
