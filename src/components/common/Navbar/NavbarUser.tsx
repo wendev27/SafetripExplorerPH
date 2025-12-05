@@ -21,7 +21,7 @@ export default function NavbarUser() {
         SafeTrip Explorer
       </Link>
       <div className="space-x-4">
-        <Link href="/">Explore</Link>
+        <Link href="/">Home</Link>
         <Link href="/features/dashboard/user">Dashboard</Link>
         <Link href="/features/profile/user">My Profile</Link>
         <button

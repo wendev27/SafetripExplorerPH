@@ -22,11 +22,11 @@ export default function NavbarSuperAdmin() {
         <Link href="/logout"></Link>
       </div>
       <div className="space-x-4">
-        <Link href="/dashboard">Dashboard</Link>
-        <Link href="/spots">Manage Spots</Link>
+        <Link href="/features/dashboard/sadmin">Dashboard</Link>
+        {/* <Link href="/spots">Manage Spots</Link>
         <Link href="/reviews">Reviews</Link>
         <Link href="/users">Users</Link>
-        <Link href="/logs">Logs</Link>
+        <Link href="/logs">Logs</Link> */}
         <button
           onClick={handleLogout}
           className="text-red-500 hover:text-gray-200 ml-7"
