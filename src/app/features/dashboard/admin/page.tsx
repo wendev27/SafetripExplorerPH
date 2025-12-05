@@ -88,12 +88,12 @@ export default function AdminDashboard() {
 
     try {
       const response = await fetch(`/api/admin/spots/${spotId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (response.ok) {
         alert("Spot deleted successfully!");
-        setSpots(spots.filter(spot => spot._id !== spotId));
+        setSpots(spots.filter((spot) => spot._id !== spotId));
       } else {
         alert("Failed to delete spot");
       }
@@ -130,7 +130,9 @@ export default function AdminDashboard() {
 
   return (
     <div className="p-10">
-      <h1 className="text-3xl font-bold">Admin Dashboard - {session?.user?.name} 👋</h1>
+      <h1 className="text-3xl font-bold">
+        Admin Dashboard - {session?.user?.name} 👋
+      </h1>
 
       <p className="mt-4 text-gray-600">
         Manage your tourist spots and handle booking requests.
@@ -165,8 +167,12 @@ export default function AdminDashboard() {
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
-                <h3 className="text-xl font-semibold text-blue-800 mb-2">Add New Spot</h3>
-                <p className="text-blue-600 mb-4">Create a new tourist spot for users to discover.</p>
+                <h3 className="text-xl font-semibold text-blue-800 mb-2">
+                  Add New Spot
+                </h3>
+                <p className="text-blue-600 mb-4">
+                  Create a new tourist spot for users to discover.
+                </p>
                 <a
                   href="/features/spots/admin"
                   className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
@@ -176,8 +182,12 @@ export default function AdminDashboard() {
               </div>
 
               <div className="bg-green-50 p-6 rounded-lg border border-green-200">
-                <h3 className="text-xl font-semibold text-green-800 mb-2">View All Spots</h3>
-                <p className="text-green-600 mb-4">Browse and manage all spots in the system.</p>
+                <h3 className="text-xl font-semibold text-green-800 mb-2">
+                  View All Spots
+                </h3>
+                <p className="text-green-600 mb-4">
+                  Browse and manage all spots in the system.
+                </p>
                 <a
                   href="/"
                   className="inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
@@ -189,13 +199,17 @@ export default function AdminDashboard() {
 
             {/* My Created Spots Section */}
             <div className="mt-12">
-                    <h2 className="text-2xl font-semibold mb-6">My Created Spots ({spots.length})</h2>
+              <h2 className="text-2xl font-semibold mb-6">
+                My Created Spots ({spots.length})
+              </h2>
 
               {loading ? (
                 <p className="text-gray-600">Loading your spots...</p>
               ) : spots.length === 0 ? (
                 <div className="bg-gray-50 p-8 rounded-lg text-center">
-                  <p className="text-gray-600 mb-4">You haven't created any spots yet.</p>
+                  <p className="text-gray-600 mb-4">
+                    You haven't created any spots yet.
+                  </p>
                   <a
                     href="/features/spots/admin"
                     className="px-6 py-3 bg-purple-600 text-white rounded hover:bg-purple-700"
@@ -205,63 +219,72 @@ export default function AdminDashboard() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {spots.map((spot) => (
-              <div
-                key={spot._id}
-                className="bg-white rounded-xl shadow hover:shadow-xl transition overflow-hidden border"
-              >
-                {/* Spot Image */}
-                <img
-                  src={spot.images?.[0] || "/placeholder-image.jpg"}
-                  alt={spot.title}
-                  className="w-full h-48 object-cover"
-                />
-
-                <div className="p-4">
-                  {/* Title & Category */}
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-semibold">{spot.title}</h3>
-                    <span className="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded">
-                      {spot.category}
-                    </span>
-                  </div>
-
-                  {/* Location */}
-                  <p className="text-gray-500 text-sm mb-2">{spot.location}</p>
-
-                  {/* Description preview */}
-                  <p className="text-gray-700 text-sm line-clamp-3 mb-3">
-                    {spot.description}
-                  </p>
-
-                  {/* Price */}
-                  <p className="text-lg font-bold text-green-600 mb-3">
-                    ₱{spot.price.toLocaleString()}
-                  </p>
-
-                  {/* Created Date */}
-                  <p className="text-gray-500 text-xs mb-4">
-                    Created: {new Date(spot.createdAt).toLocaleDateString()}
-                  </p>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => router.push(`/features/spots/user/check-spot/${spot._id}`)}
-                      className="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition text-sm"
+                  {spots.map((spot) => (
+                    <div
+                      key={spot._id}
+                      className="bg-white rounded-xl shadow hover:shadow-xl transition overflow-hidden border"
                     >
-                      View Details
-                    </button>
-                    <button
-                      onClick={() => handleDeleteSpot(spot._id)}
-                      className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition text-sm"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+                      {/* Spot Image */}
+                      <img
+                        src={spot.images?.[0] || "/placeholder-image.jpg"}
+                        alt={spot.title}
+                        className="w-full h-48 object-cover"
+                      />
+
+                      <div className="p-4">
+                        {/* Title & Category */}
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="text-xl font-semibold">
+                            {spot.title}
+                          </h3>
+                          <span className="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded">
+                            {spot.category}
+                          </span>
+                        </div>
+
+                        {/* Location */}
+                        <p className="text-gray-500 text-sm mb-2">
+                          {spot.location}
+                        </p>
+
+                        {/* Description preview */}
+                        <p className="text-gray-700 text-sm line-clamp-3 mb-3">
+                          {spot.description}
+                        </p>
+
+                        {/* Price */}
+                        <p className="text-lg font-bold text-green-600 mb-3">
+                          ₱{spot.price.toLocaleString()}
+                        </p>
+
+                        {/* Created Date */}
+                        <p className="text-gray-500 text-xs mb-4">
+                          Created:{" "}
+                          {new Date(spot.createdAt).toLocaleDateString()}
+                        </p>
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() =>
+                              router.push(
+                                `/features/spots/user/check-spot/${spot._id}`
+                              )
+                            }
+                            className="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition text-sm"
+                          >
+                            View Details
+                          </button>
+                          <button
+                            onClick={() => handleDeleteSpot(spot._id)}
+                            className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition text-sm"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -271,8 +294,12 @@ export default function AdminDashboard() {
         {activeTab === "bookings" && (
           <div className="bg-white rounded-lg shadow">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-900">Booking Requests</h2>
-              <p className="text-sm text-gray-500">Manage bookings for your tourist spots</p>
+              <h2 className="text-lg font-medium text-gray-900">
+                Booking Requests
+              </h2>
+              <p className="text-sm text-gray-500">
+                Manage bookings for your tourist spots
+              </p>
             </div>
             <div className="overflow-x-auto">
               {loading ? (
@@ -306,23 +333,36 @@ export default function AdminDashboard() {
                     {bookings.map((booking) => (
                       <tr key={booking._id}>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{booking.userId?.name}</div>
-                          <div className="text-sm text-gray-500">{booking.userId?.email}</div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {booking.userId?.name}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {booking.userId?.email}
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{booking.spotId?.title}</div>
-                          <div className="text-sm text-gray-500">{booking.spotId?.location}</div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {booking.spotId?.title}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {booking.spotId?.location}
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {new Date(booking.createdAt).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            booking.status === "accepted" ? "bg-green-100 text-green-800" :
-                            booking.status === "rejected" ? "bg-red-100 text-red-800" :
-                            booking.status === "completed" ? "bg-blue-100 text-blue-800" :
-                            "bg-yellow-100 text-yellow-800"
-                          }`}>
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              booking.status === "accepted"
+                                ? "bg-green-100 text-green-800"
+                                : booking.status === "rejected"
+                                ? "bg-red-100 text-red-800"
+                                : booking.status === "completed"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
                             {booking.status}
                           </span>
                         </td>
@@ -330,13 +370,17 @@ export default function AdminDashboard() {
                           {booking.status === "pending" && (
                             <>
                               <button
-                                onClick={() => updateBookingStatus(booking._id, "accepted")}
+                                onClick={() =>
+                                  updateBookingStatus(booking._id, "accepted")
+                                }
                                 className="text-green-600 hover:text-green-900"
                               >
                                 Accept
                               </button>
                               <button
-                                onClick={() => updateBookingStatus(booking._id, "rejected")}
+                                onClick={() =>
+                                  updateBookingStatus(booking._id, "rejected")
+                                }
                                 className="text-red-600 hover:text-red-900"
                               >
                                 Reject
@@ -345,7 +389,9 @@ export default function AdminDashboard() {
                           )}
                           {booking.status === "accepted" && (
                             <button
-                              onClick={() => updateBookingStatus(booking._id, "completed")}
+                              onClick={() =>
+                                updateBookingStatus(booking._id, "completed")
+                              }
                               className="text-blue-600 hover:text-blue-900"
                             >
                               Mark Complete
