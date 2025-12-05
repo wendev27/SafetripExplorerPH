@@ -32,7 +32,6 @@ export default function LoginPage() {
     if (res?.error) {
       setError(res.error);
     } else {
-      // Get the session to check user role
       const session = await getSession();
 
       if (session?.user?.userRole === "superadmin") {
@@ -40,18 +39,19 @@ export default function LoginPage() {
       } else if (session?.user?.userRole === "admin") {
         router.push("/features/dashboard/admin");
       } else {
-        router.push("/"); // Regular users go to landing page
+        router.push("/");
       }
     }
   };
 
   return (
-    <div className="p-16 my-40 flex items-center justify-center bg-gray-50">
+    <div className="p-12  flex items-center justify-center bg-gray-50">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white p-8 rounded shadow-md w-full max-w-md"
       >
         <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
+
         {error && <p className="text-red-500 mb-4">{error}</p>}
 
         <input
@@ -87,6 +87,30 @@ export default function LoginPage() {
             Create an account
           </Link>
         </p>
+
+        {/* ---------- TEST ACCOUNTS SECTION ---------- */}
+        <div className="mt-8 p-4 bg-gray-100 rounded text-sm">
+          <h2 className="font-semibold mb-2 text-center">Test Accounts</h2>
+
+          <div className="mb-3">
+            <p className="font-medium">User</p>
+            <p>Email: w@w.com</p>
+            <p>Password: wendell</p>
+          </div>
+
+          <div className="mb-3">
+            <p className="font-medium">Admin</p>
+            <p>Email: tryvercel@tryvercel.com</p>
+            <p>Password: tryvercel</p>
+          </div>
+
+          <div>
+            <p className="font-medium">Super Admin</p>
+            <p>Email: sadmin@s.com</p>
+            <p>Password: sadmin</p>
+          </div>
+        </div>
+        {/* ----------------------------------------- */}
       </form>
     </div>
   );
