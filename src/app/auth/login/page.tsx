@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -32,7 +32,16 @@ export default function LoginPage() {
     if (res?.error) {
       setError(res.error);
     } else {
-      router.push("/");
+      // Get the session to check user role
+      const session = await getSession();
+
+      if (session?.user?.userRole === "superadmin") {
+        router.push("/features/dashboard/sadmin");
+      } else if (session?.user?.userRole === "admin") {
+        router.push("/features/dashboard/admin");
+      } else {
+        router.push("/"); // Regular users go to landing page
+      }
     }
   };
 
