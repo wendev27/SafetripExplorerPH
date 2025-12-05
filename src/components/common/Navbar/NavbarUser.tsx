@@ -21,8 +21,9 @@ export default function NavbarUser() {
         SafeTrip Explorer
       </Link>
       <div className="space-x-4">
-        <Link href="/spots">Explore</Link>
-        <Link href="/pages/profile/user">My Profile</Link>
+        <Link href="/">Explore</Link>
+        <Link href="/features/dashboard/user">Dashboard</Link>
+        <Link href="/features/profile/user">My Profile</Link>
         <button
           onClick={handleLogout}
           className="text-white hover:text-gray-200"

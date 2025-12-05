@@ -1,9 +1,18 @@
-// services/models/TouristSpot.ts
-
 import mongoose, { Schema, model, models } from "mongoose";
 
-const userApplicationSchema = new Schema({});
+const applicationSchema = new Schema(
+  {
+    spotId: { type: Schema.Types.ObjectId, ref: "TouristSpot", required: true },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "rejected"],
+      default: "pending",
+    },
+  },
+  { timestamps: true }
+);
 
 const UserApplication =
-  models.UserApplication || model("UserApplication", userApplicationSchema);
+  models.UserApplication || model("UserApplication", applicationSchema);
 export default UserApplication;

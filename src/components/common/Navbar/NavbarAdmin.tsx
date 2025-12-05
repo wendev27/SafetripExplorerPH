@@ -14,16 +14,16 @@ export default function NavbarAdmin() {
   };
   return (
     <nav className="bg-blue-700 text-white px-6 py-4 flex justify-between items-center">
-      <Link href="/" className="font-bold text-xl">
+      <Link href="/features/dashboard/admin" className="font-bold text-xl">
         SafeTrip Admin
       </Link>
       <div className="space-x-4">
         <Link href="/logout"></Link>
       </div>
       <div className="space-x-4">
-        <Link href="/pages/dashboard/admin">Dashboard</Link>
-        <Link href="/pages/spots/admin/">Manage Spots</Link>
-        <Link href="/reviews">Manage Reviews</Link>
+        <Link href="/features/dashboard/admin">Dashboard</Link>
+        <Link href="/features/spots/admin/">Manage Spots</Link>
+        <Link href="/features">Manage Reviews</Link>
 
         <button
           onClick={handleLogout}
