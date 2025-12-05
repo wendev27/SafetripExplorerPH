@@ -78,7 +78,7 @@ export default function SpotPage() {
   if (!spot) return <p className="p-6">Spot not found</p>;
 
   return (
-    <div className="p-6 max-w-3xl mx-auto">
+    <div className="p-6 py-25 max-w-3xl mx-auto">
       <button
         onClick={() => router.back()}
         className="mb-4 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
@@ -126,7 +126,7 @@ export default function SpotPage() {
       <button
         onClick={handleApply}
         disabled={applying}
-        className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition"
+        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-purple-700 transition"
       >
         {applying ? "Applying..." : "Apply for this Spot"}
       </button>

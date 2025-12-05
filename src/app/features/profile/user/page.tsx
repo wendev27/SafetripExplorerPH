@@ -7,25 +7,38 @@ export default function ProfilePage() {
   const { data: session } = useSession();
 
   return (
-    <div className="p-10 max-w-xl mx-10 bg-gray-100 rounded shadow text-c">
-      <h1 className="text-3xl font-bold mb-4">Your Profile</h1>
+    <div className="py-50 flex justify-center items-center bg-gray-50">
+      <div className="p-8 bg-white rounded-xl shadow-lg w-full max-w-xl">
+        <h1 className="text-3xl font-semibold text-center text-gray-800 mb-6">
+          Your Profile
+        </h1>
 
-      <div className="bg-white p-6 rounded shadow">
-        <p className="mb-2">
-          <strong>Name:</strong> {session?.user?.name}
-        </p>
-        <p className="mb-2">
-          <strong>Email:</strong> {session?.user?.email}
-        </p>
-        <p className="mb-2">
-          <strong>Email:</strong> {session?.user?.userRole}
-        </p>
-        <Link
-          href="/features/profile/user/update"
-          className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Update Profile
-        </Link>
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <p className="text-lg text-gray-700 font-medium">
+              <strong>Name:</strong> {session?.user?.name}
+            </p>
+          </div>
+          <div className="flex justify-between items-center">
+            <p className="text-lg text-gray-700 font-medium">
+              <strong>Email:</strong> {session?.user?.email}
+            </p>
+          </div>
+          <div className="flex justify-between items-center">
+            <p className="text-lg text-gray-700 font-medium">
+              <strong>Role:</strong> {session?.user?.userRole}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <Link
+            href="/features/profile/user/update"
+            className="block text-center bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Update Profile
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -72,7 +72,7 @@ export default function AccountPage() {
   if (!user) return <p className="text-center mt-20">Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 flex justify-center">
+    <div className="py-20 bg-gray-100 p-6 flex justify-center">
       <div className="bg-white p-8 rounded shadow max-w-lg w-full">
         <h2 className="text-2xl font-bold mb-6">Account Settings</h2>
 

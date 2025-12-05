@@ -62,14 +62,18 @@ export default function Dashboard() {
 
   return (
     <div className="p-10">
-      <h1 className="text-3xl font-bold">Welcome, {session?.user?.name} 👋</h1>
-
-      <p className="mt-4 text-gray-600">
-        Manage your spot applications and bookings.
-      </p>
+      {/* Center the text horizontally */}
+      <div className="text-center">
+        <h1 className="text-3xl font-bold">
+          Welcome, {session?.user?.name} 👋
+        </h1>
+        <p className="mt-4 text-gray-600">
+          Manage your spot applications and bookings.
+        </p>
+      </div>
 
       <div className="mt-6 space-x-4">
-        <a
+        {/* <a
           href="/profile"
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
@@ -81,7 +85,7 @@ export default function Dashboard() {
           className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
         >
           Change Password
-        </a>
+        </a> */}
       </div>
 
       {/* Booked Spots Section */}
@@ -92,7 +96,9 @@ export default function Dashboard() {
           <p className="text-gray-600">Loading your applications...</p>
         ) : applications.length === 0 ? (
           <div className="bg-gray-50 p-8 rounded-lg text-center">
-            <p className="text-gray-600 mb-4">You haven't applied for any spots yet.</p>
+            <p className="text-gray-600 mb-4">
+              You haven't applied for any spots yet.
+            </p>
             <a
               href="/"
               className="px-6 py-3 bg-purple-600 text-white rounded hover:bg-purple-700"
@@ -109,7 +115,9 @@ export default function Dashboard() {
               >
                 {/* Spot Image */}
                 <img
-                  src={application.spotId.images?.[0] || "/placeholder-image.jpg"}
+                  src={
+                    application.spotId.images?.[0] || "/placeholder-image.jpg"
+                  }
                   alt={application.spotId.title}
                   className="w-full h-48 object-cover"
                 />
@@ -117,7 +125,9 @@ export default function Dashboard() {
                 <div className="p-4">
                   {/* Title & Status */}
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-semibold">{application.spotId.title}</h3>
+                    <h3 className="text-xl font-semibold">
+                      {application.spotId.title}
+                    </h3>
                     <span
                       className={`text-xs px-2 py-1 rounded capitalize ${getStatusColor(
                         application.status
@@ -128,7 +138,9 @@ export default function Dashboard() {
                   </div>
 
                   {/* Location */}
-                  <p className="text-gray-500 text-sm mb-2">{application.spotId.location}</p>
+                  <p className="text-gray-500 text-sm mb-2">
+                    {application.spotId.location}
+                  </p>
 
                   {/* Category */}
                   <span className="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded mb-3 inline-block">
@@ -142,13 +154,14 @@ export default function Dashboard() {
 
                   {/* Applied Date */}
                   <p className="text-gray-500 text-xs">
-                    Applied on {new Date(application.createdAt).toLocaleDateString()}
+                    Applied on{" "}
+                    {new Date(application.createdAt).toLocaleDateString()}
                   </p>
 
                   {/* View Details Button */}
                   <a
                     href={`/features/spots/user/check-spot/${application.spotId._id}`}
-                    className="mt-3 w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition block text-center"
+                    className="mt-3 w-full bg-blue-600 text-white py-2 rounded hover:bg-purple-700 transition block text-center"
                   >
                     View Details
                   </a>

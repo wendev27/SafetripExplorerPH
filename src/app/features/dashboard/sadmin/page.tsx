@@ -142,7 +142,7 @@ export default function SuperAdminDashboard() {
 
       if (response.ok) {
         alert("User deleted successfully!");
-        setUsers(users.filter(user => user._id !== userId));
+        setUsers(users.filter((user) => user._id !== userId));
       } else {
         alert("Failed to delete user");
       }
@@ -162,7 +162,7 @@ export default function SuperAdminDashboard() {
 
       if (response.ok) {
         alert("Spot deleted successfully!");
-        setSpots(spots.filter(spot => spot._id !== spotId));
+        setSpots(spots.filter((spot) => spot._id !== spotId));
       } else {
         alert("Failed to delete spot");
       }
@@ -202,16 +202,19 @@ export default function SuperAdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="p-10 ">
+      <div className="max-w-7xl mx-auto ">
         {/* Header */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Super Admin Dashboard 👑
-          </h1>
-          <p className="mt-2 text-gray-600">
-            Welcome back, {session?.user?.name}! You have full system control.
-          </p>
+          <div className="text-center">
+            <h1 className="text-3xl font-bold">
+              Super Admin Dashboard - {session?.user?.name}
+            </h1>
+
+            <p className="mt-4 text-gray-600">
+              Manage your website's users, spots, and bookings efficiently.
+            </p>
+          </div>
         </div>
 
         {/* Navigation Tabs */}
@@ -248,8 +251,12 @@ export default function SuperAdminDashboard() {
                     </div>
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Total Users</p>
-                    <p className="text-2xl font-bold text-gray-900">{users.length || "Loading..."}</p>
+                    <p className="text-sm font-medium text-gray-500">
+                      Total Users
+                    </p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {users.length || "Loading..."}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -262,8 +269,12 @@ export default function SuperAdminDashboard() {
                     </div>
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Total Spots</p>
-                    <p className="text-2xl font-bold text-gray-900">{spots.length || "Loading..."}</p>
+                    <p className="text-sm font-medium text-gray-500">
+                      Total Spots
+                    </p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {spots.length || "Loading..."}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -276,8 +287,12 @@ export default function SuperAdminDashboard() {
                     </div>
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Total Bookings</p>
-                    <p className="text-2xl font-bold text-gray-900">{bookings.length || "Loading..."}</p>
+                    <p className="text-sm font-medium text-gray-500">
+                      Total Bookings
+                    </p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {bookings.length || "Loading..."}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -290,7 +305,9 @@ export default function SuperAdminDashboard() {
                     </div>
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">System Status</p>
+                    <p className="text-sm font-medium text-gray-500">
+                      System Status
+                    </p>
                     <p className="text-lg font-bold text-green-600">Online</p>
                   </div>
                 </div>
@@ -301,8 +318,12 @@ export default function SuperAdminDashboard() {
           {activeTab === "users" && (
             <div className="bg-white rounded-lg shadow">
               <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-medium text-gray-900">User Management</h2>
-                <p className="text-sm text-gray-500">Manage all users and their roles</p>
+                <h2 className="text-lg font-medium text-gray-900">
+                  User Management
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Manage all users and their roles
+                </p>
               </div>
               <div className="overflow-x-auto">
                 {loading ? (
@@ -331,13 +352,21 @@ export default function SuperAdminDashboard() {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <div>
-                                <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                                <div className="text-sm text-gray-500">{user.email}</div>
+                                <div className="text-sm font-medium text-gray-900">
+                                  {user.name}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {user.email}
+                                </div>
                               </div>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(user.userRole)}`}>
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleColor(
+                                user.userRole
+                              )}`}
+                            >
                               {user.userRole}
                             </span>
                           </td>
@@ -347,7 +376,9 @@ export default function SuperAdminDashboard() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                             <select
                               value={user.userRole}
-                              onChange={(e) => updateUserRole(user._id, e.target.value)}
+                              onChange={(e) =>
+                                updateUserRole(user._id, e.target.value)
+                              }
                               className="text-xs border rounded px-2 py-1"
                             >
                               <option value="user">User</option>
@@ -374,8 +405,12 @@ export default function SuperAdminDashboard() {
             <div className="space-y-6">
               <div className="bg-white rounded-lg shadow">
                 <div className="px-6 py-4 border-b border-gray-200">
-                  <h2 className="text-lg font-medium text-gray-900">Spot Management</h2>
-                  <p className="text-sm text-gray-500">Manage all tourist spots in the system</p>
+                  <h2 className="text-lg font-medium text-gray-900">
+                    Spot Management
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    Manage all tourist spots in the system
+                  </p>
                 </div>
                 <div className="p-6">
                   {loading ? (
@@ -390,12 +425,20 @@ export default function SuperAdminDashboard() {
                             className="w-full h-32 object-cover rounded mb-3"
                           />
                           <h3 className="font-medium">{spot.title}</h3>
-                          <p className="text-sm text-gray-500">{spot.location}</p>
-                          <p className="text-sm text-gray-500">By: {spot.ownerId?.name || "Unknown"}</p>
-                          <p className="text-lg font-bold text-green-600">₱{spot.price.toLocaleString()}</p>
+                          <p className="text-sm text-gray-500">
+                            {spot.location}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            By: {spot.ownerId?.name || "Unknown"}
+                          </p>
+                          <p className="text-lg font-bold text-green-600">
+                            ₱{spot.price.toLocaleString()}
+                          </p>
                           <div className="mt-3 flex space-x-2">
                             <button
-                              onClick={() => {/* TODO: Edit spot */}}
+                              onClick={() => {
+                                /* TODO: Edit spot */
+                              }}
                               className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
                             >
                               Edit
@@ -419,8 +462,12 @@ export default function SuperAdminDashboard() {
           {activeTab === "bookings" && (
             <div className="bg-white rounded-lg shadow">
               <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-medium text-gray-900">All Bookings</h2>
-                <p className="text-sm text-gray-500">View all bookings across the entire system</p>
+                <h2 className="text-lg font-medium text-gray-900">
+                  All Bookings
+                </h2>
+                <p className="text-sm text-gray-500">
+                  View all bookings across the entire system
+                </p>
               </div>
               <div className="overflow-x-auto">
                 {loading ? (
@@ -447,15 +494,27 @@ export default function SuperAdminDashboard() {
                       {bookings.map((booking) => (
                         <tr key={booking._id}>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">{booking.userId?.name}</div>
-                            <div className="text-sm text-gray-500">{booking.userId?.email}</div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {booking.userId?.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {booking.userId?.email}
+                            </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">{booking.spotId?.title}</div>
-                            <div className="text-sm text-gray-500">{booking.spotId?.location}</div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {booking.spotId?.title}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {booking.spotId?.location}
+                            </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(booking.status)}`}>
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                                booking.status
+                              )}`}
+                            >
                               {booking.status}
                             </span>
                           </td>

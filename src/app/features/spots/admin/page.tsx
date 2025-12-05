@@ -59,7 +59,7 @@ export default function AdminAddSpotPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center p-6">
+    <div className="p-15 bg-gray-100 flex justify-center p-6">
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="bg-white p-8 rounded shadow-md w-full max-w-lg space-y-4"
