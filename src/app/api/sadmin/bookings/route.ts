@@ -19,20 +19,31 @@ export async function GET() {
 
     const bookings = await UserApplication.find({})
       .populate({
-        path: 'userId',
-        model: 'User',
-        select: 'name email userRole'
+        path: "userId",
+        model: "User",
+        select: "name email role",
       })
       .populate({
-        path: 'spotId',
-        model: 'TouristSpot',
-        select: 'title location price ownerId'
+        path: "spotId",
+        model: "TouristSpot",
+        select: "title location price ownerId",
       })
       .sort({ createdAt: -1 });
 
-    return NextResponse.json({ success: true, data: bookings });
+    // Transform role to userRole for frontend consistency
+    const transformedBookings = bookings.map((booking) => ({
+      ...booking.toObject(),
+      userId: booking.userId
+        ? {
+            ...booking.userId.toObject(),
+            userRole: booking.userId.role,
+          }
+        : booking.userId,
+    }));
+
+    return NextResponse.json({ success: true, data: transformedBookings });
   } catch (error) {
-    console.error('Error fetching all bookings:', error);
+    console.error("Error fetching all bookings:", error);
     return NextResponse.json(
       { success: false, message: "Server Error" },
       { status: 500 }

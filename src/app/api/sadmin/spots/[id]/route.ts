@@ -36,9 +36,9 @@ export async function PUT(
       },
       { new: true }
     ).populate({
-      path: 'ownerId',
-      model: 'User',
-      select: 'name email userRole'
+      path: "ownerId",
+      model: "User",
+      select: "name email role",
     });
 
     if (!updatedSpot) {
@@ -48,9 +48,20 @@ export async function PUT(
       );
     }
 
-    return NextResponse.json({ success: true, data: updatedSpot });
+    // Transform role to userRole for frontend consistency
+    const transformedSpot = {
+      ...updatedSpot.toObject(),
+      ownerId: updatedSpot.ownerId
+        ? {
+            ...updatedSpot.ownerId.toObject(),
+            userRole: updatedSpot.ownerId.role,
+          }
+        : updatedSpot.ownerId,
+    };
+
+    return NextResponse.json({ success: true, data: transformedSpot });
   } catch (error) {
-    console.error('Error updating spot:', error);
+    console.error("Error updating spot:", error);
     return NextResponse.json(
       { success: false, message: "Server Error" },
       { status: 500 }
@@ -85,9 +96,12 @@ export async function DELETE(
       );
     }
 
-    return NextResponse.json({ success: true, message: "Spot deleted successfully" });
+    return NextResponse.json({
+      success: true,
+      message: "Spot deleted successfully",
+    });
   } catch (error) {
-    console.error('Error deleting spot:', error);
+    console.error("Error deleting spot:", error);
     return NextResponse.json(
       { success: false, message: "Server Error" },
       { status: 500 }

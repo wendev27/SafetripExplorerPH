@@ -25,7 +25,7 @@ export async function PUT(
 
     const updatedUser = await User.findByIdAndUpdate(
       id,
-      { userRole: body.userRole },
+      { role: body.userRole },
       { new: true }
     ).select("-password");
 
@@ -36,9 +36,15 @@ export async function PUT(
       );
     }
 
-    return NextResponse.json({ success: true, data: updatedUser });
+    // Transform role to userRole for frontend consistency
+    const transformedUser = {
+      ...updatedUser.toObject(),
+      userRole: updatedUser.role,
+    };
+
+    return NextResponse.json({ success: true, data: transformedUser });
   } catch (error) {
-    console.error('Error updating user:', error);
+    console.error("Error updating user:", error);
     return NextResponse.json(
       { success: false, message: "Server Error" },
       { status: 500 }
@@ -81,9 +87,12 @@ export async function DELETE(
       );
     }
 
-    return NextResponse.json({ success: true, message: "User deleted successfully" });
+    return NextResponse.json({
+      success: true,
+      message: "User deleted successfully",
+    });
   } catch (error) {
-    console.error('Error deleting user:', error);
+    console.error("Error deleting user:", error);
     return NextResponse.json(
       { success: false, message: "Server Error" },
       { status: 500 }

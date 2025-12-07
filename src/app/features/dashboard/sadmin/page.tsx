@@ -199,6 +199,7 @@ export default function SuperAdminDashboard() {
     { id: "users" as TabType, label: "Manage Users", icon: "👥" },
     { id: "spots" as TabType, label: "Manage Spots", icon: "🏖️" },
     { id: "bookings" as TabType, label: "All Bookings", icon: "📅" },
+    { id: "logs" as TabType, label: "System Logs", icon: "📝" },
   ];
 
   return (
