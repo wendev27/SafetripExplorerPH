@@ -29,6 +29,7 @@ export async function POST(req: Request) {
       images: body.images || [],
       amenities: body.amenities || [],
       ownerId: session.user.id, // Set the owner
+      status: "pending", // Set status to pending for approval workflow
     });
 
     return NextResponse.json({ success: true, data: newSpot });

@@ -11,6 +11,13 @@ const touristSpotSchema = new Schema(
     images: [{ type: String }], // array of URLs
     amenities: [{ type: String }], // optional
     ownerId: { type: Schema.Types.ObjectId, ref: "User", required: false },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending"
+    },
+    reviewedBy: { type: Schema.Types.ObjectId, ref: "User", required: false },
+    reviewNotes: { type: String, trim: true },
   },
   { timestamps: true }
 );

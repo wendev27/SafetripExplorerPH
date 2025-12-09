@@ -12,7 +12,7 @@ export async function GET(request: Request) {
 
     if (id) {
       // Handle individual spot request
-      const spot = await TouristSpot.findById(id);
+      const spot = await TouristSpot.findOne({ _id: id, status: "approved" });
       if (!spot) {
         return NextResponse.json(
           { success: false, message: "Spot not found" },
@@ -22,8 +22,8 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: true, data: spot });
     }
 
-    // Handle all spots request
-    const spots = await TouristSpot.find().sort({ createdAt: -1 });
+    // Handle all spots request - only show approved spots
+    const spots = await TouristSpot.find({ status: "approved" }).sort({ createdAt: -1 });
     return NextResponse.json({ success: true, data: spots });
   } catch (error) {
     return NextResponse.json(

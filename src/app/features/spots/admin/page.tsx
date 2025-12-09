@@ -37,18 +37,21 @@ export default function AdminAddSpotPage() {
         .map((a) => a.trim())
         .filter((a) => a !== "");
 
-      await axios.post("/api/admin/spots/create/", {
+      const response = await axios.post("/api/admin/spots/create", {
         ...data,
         images,
         amenities,
       });
 
-      alert("Tourist spot added successfully!");
-      reset();
-      setImages([]);
-      setAmenitiesInput("");
-      router.push("/features/dashboard/admin");
+      if (response.data.success) {
+        alert("Tourist spot added successfully! It will be reviewed by a super admin before being published.");
+        reset();
+        setImages([]);
+        setAmenitiesInput("");
+        router.push("/features/dashboard/admin");
+      }
     } catch (err: any) {
+      console.error('Error creating spot:', err);
       alert(err.response?.data?.message || "Something went wrong");
     }
   };

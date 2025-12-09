@@ -25,16 +25,20 @@ export async function GET() {
       })
       .sort({ createdAt: -1 });
 
-    // Transform role to userRole for frontend consistency
-    const transformedSpots = spots.map((spot) => ({
-      ...spot.toObject(),
-      ownerId: spot.ownerId
-        ? {
-            ...spot.ownerId.toObject(),
-            userRole: spot.ownerId.role,
-          }
-        : spot.ownerId,
-    }));
+    // Transform role to userRole for frontend consistency and ensure status field exists
+    const transformedSpots = spots.map((spot) => {
+      const spotObj = spot.toObject();
+      return {
+        ...spotObj,
+        status: spotObj.status || 'pending', // Default to pending if status is missing
+        ownerId: spot.ownerId
+          ? {
+              ...spot.ownerId.toObject(),
+              userRole: spot.ownerId.role,
+            }
+          : spot.ownerId,
+      };
+    });
 
     return NextResponse.json({ success: true, data: transformedSpots });
   } catch (error) {
