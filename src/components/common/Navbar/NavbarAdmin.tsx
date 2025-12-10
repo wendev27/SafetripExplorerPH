@@ -1,45 +1,75 @@
-// src/components/common/Navbar/NavbarAdmin.tsx
+"use client";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { useState } from "react";
 import islogo from "../../../../public/islogo.png";
 
 export default function NavbarAdmin() {
   const logout = useAuthStore((state) => state.logout);
+  const [open, setOpen] = useState(false);
 
   const handleLogout = async () => {
-    logout(); // reset Zustand user
-    await signOut({ redirect: false }); // log out from NextAuth
-    // optional: redirect manually after logout
+    logout();
+    await signOut({ redirect: false });
     window.location.href = "/";
   };
+
   return (
-    <nav className="bg-blue-700 text-white  py-6 px-30 flex justify-between items-center">
+    <nav className="bg-blue-700 text-white py-6 px-30 flex justify-between items-center">
+      {/* Logo + Title */}
       <Link
         href="/features/dashboard/admin"
-        className="font-bold text-xl justify-center flex items-center gap-2"
+        className="font-bold text-xl flex items-center gap-2"
       >
         <img
-          src={islogo.src} // Path to your JPEG image
+          src={islogo.src}
           alt="SafeTrip Icon"
-          className="h-8 w-8 object-cover rounded-full" // Adjust size as needed
+          className="h-8 w-8 object-cover rounded-full"
         />
         SafeTrip Admin
       </Link>
-      <div className="space-x-4">
-        <Link href="/logout"></Link>
-      </div>
-      <div className="space-x-4">
-        <Link href="/features/dashboard/admin">Dashboard</Link>
-        <Link href="/features/spots/admin/">Add Spots</Link>
-        {/* <Link href="/features">Manage Reviews</Link> */}
 
+      {/* DROPDOWN */}
+      <div className="relative">
         <button
-          onClick={handleLogout}
-          className="text-red-500 hover:text-gray-200 ml-7"
+          onClick={() => setOpen(!open)}
+          className="bg-blue-800 px-4 py-2 rounded-lg hover:bg-blue-900 duration-200"
         >
-          Logout
+          Menu ▾
         </button>
+
+        {open && (
+          <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg py-2 z-50">
+            <Link
+              href="/features/dashboard/admin"
+              className="block px-4 py-2 hover:bg-gray-200"
+            >
+              Dashboard
+            </Link>
+
+            <Link
+              href="/features/spots/admin/"
+              className="block px-4 py-2 hover:bg-gray-200"
+            >
+              Add Spots
+            </Link>
+
+            {/* <Link
+              href="/features/reviews/admin"
+              className="block px-4 py-2 hover:bg-gray-200"
+            >
+              Manage Reviews
+            </Link> */}
+
+            <button
+              onClick={handleLogout}
+              className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-200"
+            >
+              Logout
+            </button>
+          </div>
+        )}
       </div>
     </nav>
   );
