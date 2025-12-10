@@ -26,6 +26,7 @@ interface Spot {
     userRole: string;
   };
   status: "pending" | "approved" | "rejected";
+  isActive: boolean;
   reviewedBy?: {
     _id: string;
     name: string;
@@ -212,7 +213,12 @@ export default function SuperAdminDashboard() {
   };
 
   const deleteSpot = async (spotId: string) => {
-    if (!confirm("Are you sure you want to delete this spot?")) return;
+    if (
+      !confirm(
+        "Are you sure you want to toggle this spot? It will switch between enabled and disabled."
+      )
+    )
+      return;
 
     try {
       const response = await fetch(`/api/sadmin/spots/${spotId}`, {
@@ -220,14 +226,17 @@ export default function SuperAdminDashboard() {
       });
 
       if (response.ok) {
-        alert("Spot deleted successfully!");
-        setSpots(spots.filter((spot) => spot._id !== spotId));
+        const data = await response.json();
+        alert(
+          `Spot ${data.data?.isActive ? "enabled" : "disabled"} successfully!`
+        );
+        fetchSpots(); // Refresh the list to show updated status
       } else {
-        alert("Failed to delete spot");
+        alert("Failed to toggle spot");
       }
     } catch (error) {
-      console.error("Error deleting spot:", error);
-      alert("Error deleting spot");
+      console.error("Error toggling spot:", error);
+      alert("Error toggling spot");
     }
   };
 
@@ -482,21 +491,140 @@ export default function SuperAdminDashboard() {
                   ) : (
                     <div className="space-y-4">
                       {/* Pending Spots Section */}
-                      {spots.filter(spot => (spot.status || 'pending') === "pending").length > 0 && (
+                      {spots.filter(
+                        (spot) => (spot.status || "pending") === "pending"
+                      ).length > 0 && (
                         <div>
                           <h3 className="text-lg font-semibold text-yellow-700 mb-3">
-                            🟡 Pending Approval ({spots.filter(spot => (spot.status || 'pending') === "pending").length})
+                            🟡 Pending Approval (
+                            {
+                              spots.filter(
+                                (spot) =>
+                                  (spot.status || "pending") === "pending"
+                              ).length
+                            }
+                            )
                           </h3>
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                            {spots.filter(spot => (spot.status || 'pending') === "pending").map((spot) => (
-                              <div key={spot._id} className="border-2 border-yellow-200 rounded-lg p-4 bg-yellow-50">
+                            {spots
+                              .filter(
+                                (spot) =>
+                                  (spot.status || "pending") === "pending"
+                              )
+                              .map((spot) => (
+                                <div
+                                  key={spot._id}
+                                  className={`border-2 rounded-lg p-4 ${
+                                    (spot.status || "pending") === "pending"
+                                      ? "border-yellow-200 bg-yellow-50"
+                                      : spot.isActive
+                                      ? "border-green-200 bg-green-50"
+                                      : "border-red-200 bg-red-50 opacity-60"
+                                  }`}
+                                >
+                                  <div className="flex justify-between items-start mb-2">
+                                    <div className="flex gap-2">
+                                      <span
+                                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                                          spot.status || "pending"
+                                        )}`}
+                                      >
+                                        {(spot.status || "pending")
+                                          .charAt(0)
+                                          .toUpperCase() +
+                                          (spot.status || "pending").slice(1)}
+                                      </span>
+                                      {(spot.status || "pending") !==
+                                        "pending" && (
+                                        <span
+                                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                            spot.isActive
+                                              ? "bg-green-100 text-green-800"
+                                              : "bg-red-100 text-red-800"
+                                          }`}
+                                        >
+                                          {spot.isActive
+                                            ? "Active"
+                                            : "Disabled"}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <img
+                                    src={
+                                      spot.images?.[0] ||
+                                      "/placeholder-image.jpg"
+                                    }
+                                    alt={spot.title}
+                                    className="w-full h-32 object-cover rounded mb-3"
+                                  />
+                                  <h3 className="font-medium">{spot.title}</h3>
+                                  <p className="text-sm text-gray-500">
+                                    {spot.location}
+                                  </p>
+                                  <p className="text-sm text-gray-500">
+                                    By: {spot.ownerId?.name || "Unknown"}
+                                  </p>
+                                  <p className="text-lg font-bold text-green-600">
+                                    ₱{spot.price.toLocaleString()}
+                                  </p>
+                                  <div className="mt-3 flex space-x-2">
+                                    <button
+                                      onClick={() => approveSpot(spot._id)}
+                                      className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600"
+                                    >
+                                      ✅ Approve
+                                    </button>
+                                    <button
+                                      onClick={() => rejectSpot(spot._id)}
+                                      className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
+                                    >
+                                      ❌ Reject
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Approved and Rejected Spots Section */}
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-700 mb-3">
+                          📋 All Spots (
+                          {
+                            spots.filter(
+                              (spot) => (spot.status || "pending") !== "pending"
+                            ).length
+                          }
+                          )
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {spots
+                            .filter(
+                              (spot) => (spot.status || "pending") !== "pending"
+                            )
+                            .map((spot) => (
+                              <div
+                                key={spot._id}
+                                className="border rounded-lg p-4"
+                              >
                                 <div className="flex justify-between items-start mb-2">
-                                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(spot.status || 'pending')}`}>
-                                    {(spot.status || 'pending').charAt(0).toUpperCase() + (spot.status || 'pending').slice(1)}
+                                  <span
+                                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                                      spot.status || "pending"
+                                    )}`}
+                                  >
+                                    {(spot.status || "pending")
+                                      .charAt(0)
+                                      .toUpperCase() +
+                                      (spot.status || "pending").slice(1)}
                                   </span>
                                 </div>
                                 <img
-                                  src={spot.images?.[0] || "/placeholder-image.jpg"}
+                                  src={
+                                    spot.images?.[0] || "/placeholder-image.jpg"
+                                  }
                                   alt={spot.title}
                                   className="w-full h-32 object-cover rounded mb-3"
                                 />
@@ -507,85 +635,36 @@ export default function SuperAdminDashboard() {
                                 <p className="text-sm text-gray-500">
                                   By: {spot.ownerId?.name || "Unknown"}
                                 </p>
+                                {spot.reviewedBy && (
+                                  <p className="text-sm text-gray-500">
+                                    Reviewed by: {spot.reviewedBy.name}
+                                  </p>
+                                )}
+                                {spot.reviewNotes && (
+                                  <p className="text-xs text-gray-600 mt-1 italic">
+                                    "{spot.reviewNotes}"
+                                  </p>
+                                )}
                                 <p className="text-lg font-bold text-green-600">
                                   ₱{spot.price.toLocaleString()}
                                 </p>
                                 <div className="mt-3 flex space-x-2">
-                                  <button
-                                    onClick={() => approveSpot(spot._id)}
-                                    className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600"
-                                  >
-                                    ✅ Approve
-                                  </button>
-                                  <button
-                                    onClick={() => rejectSpot(spot._id)}
-                                    className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
-                                  >
-                                    ❌ Reject
-                                  </button>
+                                  {(spot.status || "pending") ===
+                                    "approved" && (
+                                    <button
+                                      onClick={() => deleteSpot(spot._id)}
+                                      className={`px-3 py-1 text-white text-sm rounded hover:opacity-80 ${
+                                        spot.isActive
+                                          ? "bg-red-500 hover:bg-red-600"
+                                          : "bg-green-500 hover:bg-green-600"
+                                      }`}
+                                    >
+                                      {spot.isActive ? "Disable" : "Enable"}
+                                    </button>
+                                  )}
                                 </div>
                               </div>
                             ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Approved and Rejected Spots Section */}
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-700 mb-3">
-                          📋 All Spots ({spots.filter(spot => (spot.status || 'pending') !== "pending").length})
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                          {spots.filter(spot => (spot.status || 'pending') !== "pending").map((spot) => (
-                            <div key={spot._id} className="border rounded-lg p-4">
-                              <div className="flex justify-between items-start mb-2">
-                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(spot.status || 'pending')}`}>
-                                  {(spot.status || 'pending').charAt(0).toUpperCase() + (spot.status || 'pending').slice(1)}
-                                </span>
-                              </div>
-                              <img
-                                src={spot.images?.[0] || "/placeholder-image.jpg"}
-                                alt={spot.title}
-                                className="w-full h-32 object-cover rounded mb-3"
-                              />
-                              <h3 className="font-medium">{spot.title}</h3>
-                              <p className="text-sm text-gray-500">
-                                {spot.location}
-                              </p>
-                              <p className="text-sm text-gray-500">
-                                By: {spot.ownerId?.name || "Unknown"}
-                              </p>
-                              {spot.reviewedBy && (
-                                <p className="text-sm text-gray-500">
-                                  Reviewed by: {spot.reviewedBy.name}
-                                </p>
-                              )}
-                              {spot.reviewNotes && (
-                                <p className="text-xs text-gray-600 mt-1 italic">
-                                  "{spot.reviewNotes}"
-                                </p>
-                              )}
-                              <p className="text-lg font-bold text-green-600">
-                                ₱{spot.price.toLocaleString()}
-                              </p>
-                              <div className="mt-3 flex space-x-2">
-                                <button
-                                  onClick={() => {
-                                    /* TODO: Edit spot */
-                                  }}
-                                  className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  onClick={() => deleteSpot(spot._id)}
-                                  className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
-                                >
-                                  Delete
-                                </button>
-                              </div>
-                            </div>
-                          ))}
                         </div>
                       </div>
                     </div>

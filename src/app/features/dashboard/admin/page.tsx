@@ -13,12 +13,25 @@ interface Spot {
   price: number;
   images: string[];
   amenities: string[];
+  status: "pending" | "approved" | "rejected";
+  isActive: boolean;
   createdAt: string;
+}
+
+interface Loyalty {
+  userId: string;
+  points: Number;
 }
 
 interface Booking {
   _id: string;
   status: "pending" | "accepted" | "rejected" | "completed";
+  paymentMethod: "gcash" | "credit_card" | "cash";
+  paymentDetails?: {
+    gcashNumber?: string;
+    cardNumber?: string;
+    cardholderName?: string;
+  };
   userId: {
     _id: string;
     name: string;
@@ -86,23 +99,50 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDeleteSpot = async (spotId: string) => {
-    if (!confirm("Are you sure you want to delete this spot?")) return;
+  const handleToggleSpotStatus = async (
+    spotId: string,
+    isCurrentlyActive: boolean
+  ) => {
+    const targetSpot = spots.find((s) => s._id === spotId);
+    if (targetSpot && targetSpot.status !== "approved") {
+      alert(
+        "You can only enable/disable spots that are approved by the super admin."
+      );
+      return;
+    }
+    const action = isCurrentlyActive ? "disable" : "enable";
+    if (
+      !confirm(
+        `Are you sure you want to ${action} this spot? ${
+          isCurrentlyActive
+            ? "It will no longer be visible to users."
+            : "It will become visible to users again."
+        }`
+      )
+    )
+      return;
 
     try {
       const response = await fetch(`/api/admin/spots/${spotId}`, {
-        method: "DELETE",
+        method: "DELETE", // Using DELETE method but for toggling status
       });
 
       if (response.ok) {
-        alert("Spot deleted successfully!");
-        setSpots(spots.filter((spot) => spot._id !== spotId));
+        alert(`Spot ${action}d successfully!`);
+        // Update the spot's isActive status in the local state
+        setSpots(
+          spots.map((spot) =>
+            spot._id === spotId
+              ? { ...spot, isActive: !isCurrentlyActive }
+              : spot
+          )
+        );
       } else {
-        alert("Failed to delete spot");
+        alert(`Failed to ${action} spot`);
       }
     } catch (error) {
-      console.error("Delete error:", error);
-      alert("Error deleting spot");
+      console.error("Toggle error:", error);
+      alert(`Error ${action === "disable" ? "disabling" : "enabling"} spot`);
     }
   };
 
@@ -123,6 +163,20 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error("Error updating booking:", error);
       alert("Error updating booking");
+    }
+  };
+
+  const addPointsForCompletedBooking = async (
+    userId: string,
+    points: number
+  ) => {
+    try {
+      const response = await fetch("/api/admin/loyalty/${userId}", {
+        method: "PUT",
+      });
+    } catch (error) {
+      console.error("Error adding points for complete booking", error);
+      alert("Error for loyalty points");
     }
   };
 
@@ -236,7 +290,9 @@ export default function AdminDashboard() {
                     {spots.map((spot) => (
                       <div
                         key={spot._id}
-                        className="bg-white rounded-xl shadow hover:shadow-xl transition overflow-hidden border"
+                        className={`bg-white rounded-xl shadow hover:shadow-xl transition overflow-hidden border ${
+                          !spot.isActive ? "opacity-60 border-red-200" : ""
+                        }`}
                       >
                         <img
                           src={spot.images?.[0] || "/placeholder-image.jpg"}
@@ -246,12 +302,38 @@ export default function AdminDashboard() {
 
                         <div className="p-4">
                           <div className="flex justify-between items-start mb-2">
-                            <h3 className="text-xl font-semibold">
+                            <h3
+                              className={`text-xl font-semibold ${
+                                !spot.isActive ? "text-gray-500" : ""
+                              }`}
+                            >
                               {spot.title}
                             </h3>
-                            <span className="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded">
-                              {spot.category}
-                            </span>
+                            <div className="flex gap-2">
+                              <span
+                                className={`text-xs px-2 py-1 rounded ${
+                                  spot.status === "approved"
+                                    ? "bg-green-100 text-green-600"
+                                    : spot.status === "rejected"
+                                    ? "bg-red-100 text-red-600"
+                                    : "bg-yellow-100 text-yellow-700"
+                                }`}
+                              >
+                                {spot.status}
+                              </span>
+                              <span
+                                className={`text-xs px-2 py-1 rounded ${
+                                  spot.isActive
+                                    ? "bg-green-100 text-green-600"
+                                    : "bg-red-100 text-red-600"
+                                }`}
+                              >
+                                {spot.isActive ? "Active" : "Disabled"}
+                              </span>
+                              <span className="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded">
+                                {spot.category}
+                              </span>
+                            </div>
                           </div>
 
                           <p className="text-gray-500 text-sm mb-2">
@@ -283,10 +365,34 @@ export default function AdminDashboard() {
                               View Details
                             </button>
                             <button
-                              onClick={() => handleDeleteSpot(spot._id)}
-                              className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition text-sm"
+                              onClick={() =>
+                                router.push(
+                                  `/features/spots/admin/edit/${spot._id}`
+                                )
+                              }
+                              disabled={spot.status !== "approved"}
+                              className={`px-3 py-2 rounded transition text-sm text-white ${
+                                spot.status === "approved"
+                                  ? "bg-yellow-600 hover:bg-yellow-700"
+                                  : "bg-gray-300 cursor-not-allowed"
+                              }`}
                             >
-                              Delete
+                              Edit
+                            </button>
+                            <button
+                              onClick={() =>
+                                handleToggleSpotStatus(spot._id, spot.isActive)
+                              }
+                              disabled={spot.status !== "approved"}
+                              className={`px-3 py-2 text-white rounded hover:opacity-80 transition text-sm ${
+                                spot.status !== "approved"
+                                  ? "bg-gray-300 cursor-not-allowed"
+                                  : spot.isActive
+                                  ? "bg-red-600 hover:bg-red-700"
+                                  : "bg-green-600 hover:bg-green-700"
+                              }`}
+                            >
+                              {spot.isActive ? "Disable" : "Enable"}
                             </button>
                           </div>
                         </div>
@@ -344,6 +450,9 @@ export default function AdminDashboard() {
                           Applied Date
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Payment Method
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Status
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -375,6 +484,24 @@ export default function AdminDashboard() {
 
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {new Date(booking.createdAt).toLocaleDateString()}
+                          </td>
+
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                booking.paymentMethod === "gcash"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : booking.paymentMethod === "credit_card"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                              }`}
+                            >
+                              {booking.paymentMethod === "gcash"
+                                ? "📱 GCash"
+                                : booking.paymentMethod === "credit_card"
+                                ? "💳 Card"
+                                : "💵 Cash"}
+                            </span>
                           </td>
 
                           <td className="px-6 py-4 whitespace-nowrap">

@@ -88,7 +88,7 @@ export default function LoginPage() {
           </Link>
         </p>
 
-        {/* ---------- TEST ACCOUNTS SECTION ---------- */}
+        {/* ---------- TEST ACCOUNTS SECTION ---------- 
         <div className="mt-8 p-4 bg-gray-100 rounded text-sm">
           <h2 className="font-semibold mb-2 text-center">Test Accounts</h2>
 
@@ -110,7 +110,7 @@ export default function LoginPage() {
             <p>Password: sadmin</p>
           </div>
         </div>
-        {/* ----------------------------------------- */}
+         ----------------------------------------- */}
       </form>
     </div>
   );

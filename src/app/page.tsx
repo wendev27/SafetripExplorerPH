@@ -13,6 +13,8 @@ interface Spot {
   price: number;
   images: string[];
   amenities: string[];
+  averageRating?: number;
+  totalReviews?: number;
 }
 
 export default function HomePage() {
@@ -22,12 +24,45 @@ export default function HomePage() {
   const { data: session } = useSession();
 
   useEffect(() => {
-    setLoading(true);
-    fetch("/api/shared/spots")
-      .then((res) => res.json())
-      .then((data) => setSpots(data.data || []))
-      .finally(() => setLoading(false));
+    fetchSpotsWithReviews();
   }, []);
+
+  const fetchSpotsWithReviews = async () => {
+    setLoading(true);
+    try {
+      // Fetch spots
+      const spotsRes = await fetch("/api/shared/spots");
+      const spotsData = await spotsRes.json();
+      const spotsList = spotsData.data || [];
+
+      // Fetch reviews for each spot
+      const spotsWithReviews = await Promise.all(
+        spotsList.map(async (spot: Spot) => {
+          try {
+            const reviewsRes = await fetch(`/api/reviews?spotId=${spot._id}`);
+            const reviewsData = await reviewsRes.json();
+            if (reviewsData.success) {
+              return {
+                ...spot,
+                averageRating: reviewsData.data.averageRating,
+                totalReviews: reviewsData.data.totalReviews
+              };
+            }
+          } catch (error) {
+            console.error(`Error fetching reviews for spot ${spot._id}:`, error);
+          }
+          return spot;
+        })
+      );
+
+      setSpots(spotsWithReviews);
+    } catch (error) {
+      console.error("Error fetching spots:", error);
+      setSpots([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleApplyClick = (spotId: string) => {
     if (!session?.user) {
@@ -35,6 +70,24 @@ export default function HomePage() {
       return;
     }
     router.push(`/features/spots/user/check-spot/${spotId}`);
+  };
+
+  const renderStars = (rating: number) => {
+    return (
+      <div className="flex items-center">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            className={`text-sm ${star <= Math.round(rating) ? 'text-yellow-400' : 'text-gray-300'}`}
+          >
+            ⭐
+          </span>
+        ))}
+        <span className="text-xs text-gray-600 ml-1">
+          ({rating.toFixed(1)})
+        </span>
+      </div>
+    );
   };
 
   if (loading)
@@ -121,6 +174,16 @@ export default function HomePage() {
                   <p className="text-gray-700 text-sm line-clamp-3 mb-3">
                     {spot.description}
                   </p>
+
+                  {/* Rating Display */}
+                  {spot.averageRating !== undefined && spot.totalReviews !== undefined && spot.totalReviews > 0 && (
+                    <div className="mb-3">
+                      {renderStars(spot.averageRating)}
+                      <span className="text-xs text-gray-500 ml-1">
+                        {spot.totalReviews} review{spot.totalReviews !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+                  )}
 
                   <p className="text-lg font-bold text-green-600 mb-4">
                     ₱{spot.price.toLocaleString()}

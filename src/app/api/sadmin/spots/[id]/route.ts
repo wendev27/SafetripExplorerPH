@@ -18,9 +18,9 @@ export async function PATCH(
     );
   }
 
-    const { id } = await params;
+  const { id } = await params;
 
-    console.log("Spot ID to update:", id);
+  console.log("Spot ID to update:", id);
 
   try {
     await connectDB();
@@ -32,7 +32,10 @@ export async function PATCH(
 
     if (!action || !["approve", "reject"].includes(action)) {
       return NextResponse.json(
-        { success: false, message: "Invalid action. Must be 'approve' or 'reject'" },
+        {
+          success: false,
+          message: "Invalid action. Must be 'approve' or 'reject'",
+        },
         { status: 400 }
       );
     }
@@ -60,11 +63,9 @@ export async function PATCH(
 
     console.log("Update data:", updateData);
 
-    const updatedSpot = await TouristSpot.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true }
-    ).populate({
+    const updatedSpot = await TouristSpot.findByIdAndUpdate(id, updateData, {
+      new: true,
+    }).populate({
       path: "ownerId",
       model: "User",
       select: "name email role",
@@ -83,7 +84,7 @@ export async function PATCH(
     const spotObj = updatedSpot.toObject();
     const transformedSpot = {
       ...spotObj,
-      status: spotObj.status || 'pending', // Default to pending if status is missing
+      status: spotObj.status || "pending", // Default to pending if status is missing
       ownerId: updatedSpot.ownerId
         ? {
             ...updatedSpot.ownerId.toObject(),
@@ -96,7 +97,7 @@ export async function PATCH(
     return NextResponse.json({
       success: true,
       data: transformedSpot,
-      message: `Spot ${action}d successfully`
+      message: `Spot ${action}d successfully`,
     });
   } catch (error) {
     console.error("Error updating spot status:", error);
@@ -192,21 +193,43 @@ export async function DELETE(
   try {
     await connectDB();
 
-    const deletedSpot = await TouristSpot.findByIdAndDelete(id);
+    // Soft delete: toggle the isActive status safely
+    const spot = await TouristSpot.findById(id).populate({
+      path: "ownerId",
+      model: "User",
+      select: "name email role",
+    });
 
-    if (!deletedSpot) {
+    if (!spot) {
       return NextResponse.json(
         { success: false, message: "Spot not found" },
         { status: 404 }
       );
     }
 
+    spot.isActive = !spot.isActive;
+    const updatedSpot = await spot.save();
+
+    // Transform role to userRole for frontend consistency
+    const transformedSpot = {
+      ...updatedSpot.toObject(),
+      ownerId: updatedSpot.ownerId
+        ? {
+            ...updatedSpot.ownerId.toObject(),
+            userRole: updatedSpot.ownerId.role,
+          }
+        : updatedSpot.ownerId,
+    };
+
     return NextResponse.json({
       success: true,
-      message: "Spot deleted successfully",
+      message: `Spot ${
+        updatedSpot.isActive ? "enabled" : "disabled"
+      } successfully`,
+      data: transformedSpot,
     });
   } catch (error) {
-    console.error("Error deleting spot:", error);
+    console.error("Error toggling spot status:", error);
     return NextResponse.json(
       { success: false, message: "Server Error" },
       { status: 500 }
