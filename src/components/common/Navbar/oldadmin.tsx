@@ -1,12 +1,11 @@
 "use client";
-
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useState } from "react";
 import islogo from "../../../../public/islogo.png";
 
-export default function NavbarUser() {
+export default function NavbarAdmin() {
   const logout = useAuthStore((state) => state.logout);
   const [open, setOpen] = useState(false);
 
@@ -17,25 +16,25 @@ export default function NavbarUser() {
   };
 
   return (
-    <nav className="bg-blue-600 text-white py-4 px-6 shadow-md flex justify-between items-center">
-      {/* Logo */}
+    <nav className="bg-blue-700 text-white py-6 px-30 flex justify-between items-center">
+      {/* Logo + Title */}
       <Link
-        href="/"
-        className="font-bold text-xl flex items-center gap-2 hover:opacity-90 transition"
+        href="/features/dashboard/admin"
+        className="font-bold text-xl flex items-center gap-2"
       >
         <img
           src={islogo.src}
           alt="SafeTrip Icon"
           className="h-8 w-8 object-cover rounded-full"
         />
-        SafeTrip Explorer
+        SafeTrip Admin
       </Link>
 
-      {/* Dropdown */}
+      {/* DROPDOWN */}
       <div className="relative">
         <button
           onClick={() => setOpen(!open)}
-          className="bg-blue-700 px-4 py-2 rounded-lg hover:bg-blue-800 transition"
+          className="bg-blue-800 px-4 py-2 rounded-lg hover:bg-blue-900 duration-200"
         >
           Menu ▾
         </button>
@@ -43,29 +42,29 @@ export default function NavbarUser() {
         {open && (
           <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg py-2 z-50">
             <Link
-              href="/"
-              className="block px-4 py-2 hover:bg-gray-100 transition"
-            >
-              Home
-            </Link>
-
-            <Link
-              href="/features/dashboard/user"
-              className="block px-4 py-2 hover:bg-gray-100 transition"
+              href="/features/dashboard/admin"
+              className="block px-4 py-2 hover:bg-gray-200"
             >
               Dashboard
             </Link>
 
             <Link
-              href="/features/profile/user"
-              className="block px-4 py-2 hover:bg-gray-100 transition"
+              href="/features/spots/admin/"
+              className="block px-4 py-2 hover:bg-gray-200"
             >
-              My Profile
+              Add Spots
             </Link>
+
+            {/* <Link
+              href="/features/reviews/admin"
+              className="block px-4 py-2 hover:bg-gray-200"
+            >
+              Manage Reviews
+            </Link> */}
 
             <button
               onClick={handleLogout}
-              className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 transition"
+              className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-200"
             >
               Logout
             </button>

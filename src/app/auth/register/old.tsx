@@ -47,104 +47,89 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-300 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-white/90 backdrop-blur-md p-10 rounded-2xl shadow-xl w-full max-w-md border border-gray-200"
+        className="bg-white p-8 rounded shadow-md w-full max-w-md"
       >
-        <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">
-          Create Account
-        </h1>
+        <h1 className="text-2xl font-bold mb-6 text-center">Register</h1>
 
         {/* NAME */}
-        <div className="mb-5">
-          <input
-            type="text"
-            placeholder="Name"
-            {...register("name")}
-            className="w-full p-3.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {formState.errors.name && (
-            <p className="text-red-500 text-sm mt-1">
-              {formState.errors.name.message}
-            </p>
-          )}
-        </div>
+        <input
+          type="text"
+          placeholder="Name"
+          {...register("name")}
+          className="w-full p-3 mb-4 border rounded"
+        />
+        {formState.errors.name && (
+          <p className="text-red-500">{formState.errors.name.message}</p>
+        )}
 
         {/* EMAIL */}
-        <div className="mb-5">
-          <input
-            type="email"
-            placeholder="Email"
-            {...register("email")}
-            className="w-full p-3.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          {formState.errors.email && (
-            <p className="text-red-500 text-sm mt-1">
-              {formState.errors.email.message}
-            </p>
-          )}
-        </div>
+        <input
+          type="email"
+          placeholder="Email"
+          {...register("email")}
+          className="w-full p-3 mb-4 border rounded"
+        />
+        {formState.errors.email && (
+          <p className="text-red-500">{formState.errors.email.message}</p>
+        )}
 
         {/* PASSWORD */}
-        <div className="relative mb-5">
+        <div className="relative mb-4">
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             {...register("password")}
-            className="w-full p-3.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 border rounded"
           />
           <button
             type="button"
-            className="absolute right-4 top-3.5 text-sm text-gray-500"
+            className="absolute right-3 top-3 text-sm text-gray-500"
             onClick={() => setShowPassword((prev) => !prev)}
           >
             {showPassword ? "Hide" : "Show"}
           </button>
-          {formState.errors.password && (
-            <p className="text-red-500 text-sm mt-1">
-              {formState.errors.password.message}
-            </p>
-          )}
         </div>
+        {formState.errors.password && (
+          <p className="text-red-500">{formState.errors.password.message}</p>
+        )}
 
         {/* CONFIRM PASSWORD */}
-        <div className="relative mb-6">
+        <div className="relative mb-4">
           <input
             type={showConfirmPassword ? "text" : "password"}
             placeholder="Confirm Password"
             {...register("confirmPassword")}
-            className="w-full p-3.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 border rounded"
           />
           <button
             type="button"
-            className="absolute right-4 top-3.5 text-sm text-gray-500"
+            className="absolute right-3 top-3 text-sm text-gray-500"
             onClick={() => setShowConfirmPassword((prev) => !prev)}
           >
             {showConfirmPassword ? "Hide" : "Show"}
           </button>
-          {formState.errors.confirmPassword && (
-            <p className="text-red-500 text-sm mt-1">
-              {formState.errors.confirmPassword.message}
-            </p>
-          )}
         </div>
+        {formState.errors.confirmPassword && (
+          <p className="text-red-500">
+            {formState.errors.confirmPassword.message}
+          </p>
+        )}
 
         {/* SUBMIT BUTTON */}
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-lg font-semibold transition-all shadow-md"
+          className="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700 transition"
         >
           Register
         </button>
 
         {/* LINK TO LOGIN */}
-        <p className="mt-6 text-center text-sm text-gray-700">
+        <p className="mt-4 text-center text-sm text-gray-600">
           Already have an account?{" "}
-          <Link
-            href="/auth/login"
-            className="text-blue-600 font-medium hover:underline"
-          >
+          <Link href="/auth/login" className="text-blue-600 hover:underline">
             Login here
           </Link>
         </p>

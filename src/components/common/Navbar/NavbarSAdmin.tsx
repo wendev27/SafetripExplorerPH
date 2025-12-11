@@ -16,9 +16,12 @@ export default function NavbarSuperAdmin() {
   };
 
   return (
-    <nav className="bg-blue-700 text-white py-6 px-30 flex justify-between items-center">
+    <nav className="bg-blue-700 text-white py-4 px-6 shadow-md flex justify-between items-center">
       {/* Logo */}
-      <Link href="/" className="font-bold text-xl flex items-center gap-2">
+      <Link
+        href="/"
+        className="font-bold text-xl flex items-center gap-2 hover:opacity-90 transition"
+      >
         <img
           src={islogo.src}
           alt="SafeTrip Icon"
@@ -27,38 +30,31 @@ export default function NavbarSuperAdmin() {
         SafeTrip Super-Admin
       </Link>
 
-      {/* DROPDOWN MENU */}
+      {/* Dropdown */}
       <div className="relative">
         <button
           onClick={() => setOpen(!open)}
-          className="bg-blue-800 px-4 py-2 rounded-lg hover:bg-blue-900 duration-200"
+          className="bg-blue-800 px-4 py-2 rounded-lg hover:bg-blue-900 transition"
         >
           Menu ▾
         </button>
 
-        {/* Dropdown items */}
         {open && (
           <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg py-2 z-50">
             <Link
               href="/features/dashboard/sadmin"
-              className="block px-4 py-2 hover:bg-gray-200"
+              className="block px-4 py-2 hover:bg-gray-100 transition"
             >
               Dashboard
             </Link>
 
-            {/* <Link href="/spots" className="block px-4 py-2 hover:bg-gray-200">
-              Manage Spots
-            </Link>
-            <Link href="/reviews" className="block px-4 py-2 hover:bg-gray-200">
-              Reviews
-            </Link>
-            <Link href="/users" className="block px-4 py-2 hover:bg-gray-200">
-              Users
-            </Link> */}
+            {/* Example: future admin links */}
+            {/* <Link href="/features/spots" className="block px-4 py-2 hover:bg-gray-100 transition">Manage Spots</Link> */}
+            {/* <Link href="/features/users" className="block px-4 py-2 hover:bg-gray-100 transition">Users</Link> */}
 
             <button
               onClick={handleLogout}
-              className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-200"
+              className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 transition"
             >
               Logout
             </button>
