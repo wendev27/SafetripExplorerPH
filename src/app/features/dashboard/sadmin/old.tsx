@@ -284,12 +284,11 @@ export default function SuperAdminDashboard() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center px-6 py-3 text-sm font-medium text-left border-l-4 transition-all
-              ${
-                activeTab === tab.id
-                  ? "border-blue-500 text-blue-600 bg-blue-50"
-                  : "border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-100"
-              }
-            `}
+            ${
+              activeTab === tab.id
+                ? "border-blue-500 text-blue-600 bg-blue-50"
+                : "border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+            }`}
             >
               <span className="mr-3">{tab.icon}</span>
               {tab.label}
@@ -298,8 +297,12 @@ export default function SuperAdminDashboard() {
         </nav>
       </div>
 
-      {/* MAIN CONTENT AREA */}
-      <div className="flex-1 max-w-7xl mx-auto">
+      {/* Main content (your existing tab content stays here) */}
+      <div className="flex-1">
+        {/* put the rest of your dashboard content here */}
+      </div>
+
+      <div className="max-w-7xl mx-auto ">
         {/* Header */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <div className="text-center">
@@ -313,13 +316,12 @@ export default function SuperAdminDashboard() {
           </div>
         </div>
 
-        {/* TAB CONTENT */}
+        {/* Navigation Tabs */}
+
+        {/* Tab Content */}
         <div className="space-y-6">
-          {/* Overview */}
           {activeTab === "overview" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* --- Your overview cards stay exactly the same --- */}
-              {/** Total Users, Spots, Bookings, Status */}
               <div className="bg-white rounded-lg shadow p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
@@ -392,9 +394,16 @@ export default function SuperAdminDashboard() {
             </div>
           )}
 
-          {/* USERS */}
           {activeTab === "users" && (
             <div className="bg-white rounded-lg shadow">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-lg font-medium text-gray-900">
+                  User Management
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Manage all users and their roles
+                </p>
+              </div>
               <div className="overflow-x-auto">
                 {loading ? (
                   <div className="p-6 text-center">Loading users...</div>
@@ -471,69 +480,152 @@ export default function SuperAdminDashboard() {
             </div>
           )}
 
-          {/* SPOTS */}
           {activeTab === "spots" && (
             <div className="space-y-6">
-              <div className="p-6">
-                {loading ? (
-                  <div className="text-center">Loading spots...</div>
-                ) : (
-                  <div className="space-y-4">
-                    {/* Pending Spots Section */}
-                    {spots.filter(
-                      (spot) => (spot.status || "pending") === "pending"
-                    ).length > 0 && (
+              <div className="bg-white rounded-lg shadow">
+                <div className="px-6 py-4 border-b border-gray-200">
+                  <h2 className="text-lg font-medium text-gray-900">
+                    Spot Management
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    Manage all tourist spots in the system
+                  </p>
+                </div>
+                <div className="p-6">
+                  {loading ? (
+                    <div className="text-center">Loading spots...</div>
+                  ) : (
+                    <div className="space-y-4">
+                      {/* Pending Spots Section */}
+                      {spots.filter(
+                        (spot) => (spot.status || "pending") === "pending"
+                      ).length > 0 && (
+                        <div>
+                          <h3 className="text-lg font-semibold text-yellow-700 mb-3">
+                            🟡 Pending Approval (
+                            {
+                              spots.filter(
+                                (spot) =>
+                                  (spot.status || "pending") === "pending"
+                              ).length
+                            }
+                            )
+                          </h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                            {spots
+                              .filter(
+                                (spot) =>
+                                  (spot.status || "pending") === "pending"
+                              )
+                              .map((spot) => (
+                                <div
+                                  key={spot._id}
+                                  className={`border-2 rounded-lg p-4 ${
+                                    (spot.status || "pending") === "pending"
+                                      ? "border-yellow-200 bg-yellow-50"
+                                      : spot.isActive
+                                      ? "border-green-200 bg-green-50"
+                                      : "border-red-200 bg-red-50 opacity-60"
+                                  }`}
+                                >
+                                  <div className="flex justify-between items-start mb-2">
+                                    <div className="flex gap-2">
+                                      <span
+                                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                                          spot.status || "pending"
+                                        )}`}
+                                      >
+                                        {(spot.status || "pending")
+                                          .charAt(0)
+                                          .toUpperCase() +
+                                          (spot.status || "pending").slice(1)}
+                                      </span>
+                                      {(spot.status || "pending") !==
+                                        "pending" && (
+                                        <span
+                                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                            spot.isActive
+                                              ? "bg-green-100 text-green-800"
+                                              : "bg-red-100 text-red-800"
+                                          }`}
+                                        >
+                                          {spot.isActive
+                                            ? "Active"
+                                            : "Disabled"}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <img
+                                    src={
+                                      spot.images?.[0] ||
+                                      "/placeholder-image.jpg"
+                                    }
+                                    alt={spot.title}
+                                    className="w-full h-32 object-cover rounded mb-3"
+                                  />
+                                  <h3 className="font-medium">{spot.title}</h3>
+                                  <p className="text-sm text-gray-500">
+                                    {spot.location}
+                                  </p>
+                                  <p className="text-sm text-gray-500">
+                                    By: {spot.ownerId?.name || "Unknown"}
+                                  </p>
+                                  <p className="text-lg font-bold text-green-600">
+                                    ₱{spot.price.toLocaleString()}
+                                  </p>
+                                  <div className="mt-3 flex space-x-2">
+                                    <button
+                                      onClick={() => approveSpot(spot._id)}
+                                      className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600"
+                                    >
+                                      ✅ Approve
+                                    </button>
+                                    <button
+                                      onClick={() => rejectSpot(spot._id)}
+                                      className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
+                                    >
+                                      ❌ Reject
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Approved and Rejected Spots Section */}
                       <div>
-                        <h3 className="text-lg font-semibold text-yellow-700 mb-3">
-                          🟡 Pending Approval (
+                        <h3 className="text-lg font-semibold text-gray-700 mb-3">
+                          📋 All Spots (
                           {
                             spots.filter(
-                              (spot) => (spot.status || "pending") === "pending"
+                              (spot) => (spot.status || "pending") !== "pending"
                             ).length
                           }
                           )
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                           {spots
                             .filter(
-                              (spot) => (spot.status || "pending") === "pending"
+                              (spot) => (spot.status || "pending") !== "pending"
                             )
                             .map((spot) => (
                               <div
                                 key={spot._id}
-                                className={`border-2 rounded-lg p-4 ${
-                                  (spot.status || "pending") === "pending"
-                                    ? "border-yellow-200 bg-yellow-50"
-                                    : spot.isActive
-                                    ? "border-green-200 bg-green-50"
-                                    : "border-red-200 bg-red-50 opacity-60"
-                                }`}
+                                className="border rounded-lg p-4"
                               >
                                 <div className="flex justify-between items-start mb-2">
-                                  <div className="flex gap-2">
-                                    <span
-                                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                                        spot.status || "pending"
-                                      )}`}
-                                    >
-                                      {(spot.status || "pending")
-                                        .charAt(0)
-                                        .toUpperCase() +
-                                        (spot.status || "pending").slice(1)}
-                                    </span>
-                                    {(spot.status || "pending") !==
-                                      "pending" && (
-                                      <span
-                                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                          spot.isActive
-                                            ? "bg-green-100 text-green-800"
-                                            : "bg-red-100 text-red-800"
-                                        }`}
-                                      >
-                                        {spot.isActive ? "Active" : "Disabled"}
-                                      </span>
-                                    )}
-                                  </div>
+                                  <span
+                                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
+                                      spot.status || "pending"
+                                    )}`}
+                                  >
+                                    {(spot.status || "pending")
+                                      .charAt(0)
+                                      .toUpperCase() +
+                                      (spot.status || "pending").slice(1)}
+                                  </span>
                                 </div>
                                 <img
                                   src={
@@ -549,116 +641,55 @@ export default function SuperAdminDashboard() {
                                 <p className="text-sm text-gray-500">
                                   By: {spot.ownerId?.name || "Unknown"}
                                 </p>
+                                {spot.reviewedBy && (
+                                  <p className="text-sm text-gray-500">
+                                    Reviewed by: {spot.reviewedBy.name}
+                                  </p>
+                                )}
+                                {spot.reviewNotes && (
+                                  <p className="text-xs text-gray-600 mt-1 italic">
+                                    "{spot.reviewNotes}"
+                                  </p>
+                                )}
                                 <p className="text-lg font-bold text-green-600">
                                   ₱{spot.price.toLocaleString()}
                                 </p>
                                 <div className="mt-3 flex space-x-2">
-                                  <button
-                                    onClick={() => approveSpot(spot._id)}
-                                    className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600"
-                                  >
-                                    ✅ Approve
-                                  </button>
-                                  <button
-                                    onClick={() => rejectSpot(spot._id)}
-                                    className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
-                                  >
-                                    ❌ Reject
-                                  </button>
+                                  {(spot.status || "pending") ===
+                                    "approved" && (
+                                    <button
+                                      onClick={() => deleteSpot(spot._id)}
+                                      className={`px-3 py-1 text-white text-sm rounded hover:opacity-80 ${
+                                        spot.isActive
+                                          ? "bg-red-500 hover:bg-red-600"
+                                          : "bg-green-500 hover:bg-green-600"
+                                      }`}
+                                    >
+                                      {spot.isActive ? "Disable" : "Enable"}
+                                    </button>
+                                  )}
                                 </div>
                               </div>
                             ))}
                         </div>
                       </div>
-                    )}
-
-                    {/* Approved and Rejected Spots Section */}
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-700 mb-3">
-                        📋 All Spots (
-                        {
-                          spots.filter(
-                            (spot) => (spot.status || "pending") !== "pending"
-                          ).length
-                        }
-                        )
-                      </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {spots
-                          .filter(
-                            (spot) => (spot.status || "pending") !== "pending"
-                          )
-                          .map((spot) => (
-                            <div
-                              key={spot._id}
-                              className="border rounded-lg p-4"
-                            >
-                              <div className="flex justify-between items-start mb-2">
-                                <span
-                                  className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                                    spot.status || "pending"
-                                  )}`}
-                                >
-                                  {(spot.status || "pending")
-                                    .charAt(0)
-                                    .toUpperCase() +
-                                    (spot.status || "pending").slice(1)}
-                                </span>
-                              </div>
-                              <img
-                                src={
-                                  spot.images?.[0] || "/placeholder-image.jpg"
-                                }
-                                alt={spot.title}
-                                className="w-full h-32 object-cover rounded mb-3"
-                              />
-                              <h3 className="font-medium">{spot.title}</h3>
-                              <p className="text-sm text-gray-500">
-                                {spot.location}
-                              </p>
-                              <p className="text-sm text-gray-500">
-                                By: {spot.ownerId?.name || "Unknown"}
-                              </p>
-                              {spot.reviewedBy && (
-                                <p className="text-sm text-gray-500">
-                                  Reviewed by: {spot.reviewedBy.name}
-                                </p>
-                              )}
-                              {spot.reviewNotes && (
-                                <p className="text-xs text-gray-600 mt-1 italic">
-                                  "{spot.reviewNotes}"
-                                </p>
-                              )}
-                              <p className="text-lg font-bold text-green-600">
-                                ₱{spot.price.toLocaleString()}
-                              </p>
-                              <div className="mt-3 flex space-x-2">
-                                {(spot.status || "pending") === "approved" && (
-                                  <button
-                                    onClick={() => deleteSpot(spot._id)}
-                                    className={`px-3 py-1 text-white text-sm rounded hover:opacity-80 ${
-                                      spot.isActive
-                                        ? "bg-red-500 hover:bg-red-600"
-                                        : "bg-green-500 hover:bg-green-600"
-                                    }`}
-                                  >
-                                    {spot.isActive ? "Disable" : "Enable"}
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           )}
 
-          {/* BOOKINGS */}
           {activeTab === "bookings" && (
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white rounded-lg shadow">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h2 className="text-lg font-medium text-gray-900">
+                  All Bookings
+                </h2>
+                <p className="text-sm text-gray-500">
+                  View all bookings across the entire system
+                </p>
+              </div>
               <div className="overflow-x-auto">
                 {loading ? (
                   <div className="p-6 text-center">Loading bookings...</div>
