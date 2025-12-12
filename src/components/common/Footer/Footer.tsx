@@ -18,14 +18,15 @@ export default function Footer() {
           <Link href="/" className="hover:text-gray-300 transition-colors">
             Home
           </Link>
-          <Link href="/spots" className="hover:text-gray-300 transition-colors">
-            Tourist Spots
-          </Link>
-          <Link href="/about" className="hover:text-gray-300 transition-colors">
+
+          <Link
+            href="/extra/about"
+            className="hover:text-gray-300 transition-colors"
+          >
             About
           </Link>
           <Link
-            href="/contact"
+            href="/extra/contact"
             className="hover:text-gray-300 transition-colors"
           >
             Contact

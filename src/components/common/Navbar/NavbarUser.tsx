@@ -3,18 +3,40 @@
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { useAuthStore } from "@/hooks/useAuthStore";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import islogo from "../../../../public/islogo.png";
 
 export default function NavbarUser() {
   const logout = useAuthStore((state) => state.logout);
   const [open, setOpen] = useState(false);
 
+  // Added ref to detect clicks outside the dropdown
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Added useEffect to close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Updated: close dropdown immediately before logout
   const handleLogout = async () => {
+    setOpen(false); // <-- Close dropdown
     logout();
     await signOut({ redirect: false });
     window.location.href = "/";
   };
+
+  // Updated: helper function to close dropdown when a link is clicked
+  const handleLinkClick = () => setOpen(false);
 
   return (
     <nav className="bg-blue-600 text-white py-4 px-6 shadow-md flex justify-between items-center">
@@ -41,9 +63,14 @@ export default function NavbarUser() {
         </button>
 
         {open && (
-          <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg py-2 z-50">
+          <div
+            ref={dropdownRef} // <-- Added ref here
+            className="absolute right-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg py-2 z-50"
+          >
+            {/* Updated: Added onClick to close dropdown */}
             <Link
               href="/"
+              onClick={handleLinkClick}
               className="block px-4 py-2 hover:bg-gray-100 transition"
             >
               Home
@@ -51,6 +78,7 @@ export default function NavbarUser() {
 
             <Link
               href="/features/dashboard/user"
+              onClick={handleLinkClick}
               className="block px-4 py-2 hover:bg-gray-100 transition"
             >
               Dashboard
@@ -58,6 +86,7 @@ export default function NavbarUser() {
 
             <Link
               href="/features/profile/user"
+              onClick={handleLinkClick}
               className="block px-4 py-2 hover:bg-gray-100 transition"
             >
               My Profile

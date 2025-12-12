@@ -78,58 +78,64 @@ export default function SpotPage() {
   if (!spot) return <p className="p-6">Spot not found</p>;
 
   return (
-    <div className="p-6 py-25 max-w-3xl mx-auto">
+    <div className="max-w-4xl mx-auto p-6">
+      {/* Back Button */}
       <button
         onClick={() => router.back()}
-        className="mb-4 bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
+        className="mb-6 inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 transition"
       >
-        &larr; Back
+        <span className="text-xl">←</span>
+        <span className="font-medium">Back</span>
       </button>
 
-      {/* Spot Images */}
-      {spot.images && spot.images.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+      {/* Images */}
+      {spot.images?.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 rounded-xl overflow-hidden">
           {spot.images.map((img, i) => (
             <img
               key={i}
               src={img}
               alt={spot.title}
-              className="w-full h-48 object-cover rounded"
+              className="w-full h-56 object-cover rounded-xl shadow-sm"
             />
           ))}
         </div>
       )}
 
-      {/* Spot Info */}
-      <h1 className="text-3xl font-bold mb-2">{spot.title}</h1>
-      <p className="text-gray-600 mb-2">{spot.location}</p>
-      <p className="text-gray-700 mb-4">{spot.description}</p>
-      <p className="text-green-600 font-bold mb-4">
-        ₱{spot.price.toLocaleString()}
-      </p>
+      {/* Content Card */}
+      <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+        <h1 className="text-3xl font-bold mb-2 text-gray-900">{spot.title}</h1>
+        <p className="text-gray-500 mb-4 text-sm">{spot.location}</p>
 
-      {/* Amenities */}
-      {spot.amenities && spot.amenities.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          {spot.amenities.map((a, i) => (
-            <span
-              key={i}
-              className="bg-gray-200 text-gray-700 px-2 py-1 rounded-lg text-sm"
-            >
-              {a}
-            </span>
-          ))}
-        </div>
-      )}
+        <p className="text-gray-700 mb-6 leading-relaxed">{spot.description}</p>
 
-      {/* Apply Button */}
-      <button
-        onClick={handleApply}
-        disabled={applying}
-        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-purple-700 transition"
-      >
-        {applying ? "Applying..." : "Apply for this Spot"}
-      </button>
+        <p className="text-2xl font-semibold text-green-600 mb-6">
+          ₱{spot.price.toLocaleString()}
+        </p>
+
+        {/* Amenities */}
+        {spot.amenities?.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-8">
+            {spot.amenities.map((a, i) => (
+              <span
+                key={i}
+                className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm border border-blue-100"
+              >
+                {a}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Apply Button */}
+        <button
+          onClick={handleApply}
+          disabled={applying}
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl font-semibold hover:opacity-90 transition shadow-md"
+        >
+          {applying ? "Applying..." : "Apply for this Spot"}
+        </button>
+      </div>
     </div>
   );
 }
