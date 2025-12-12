@@ -84,10 +84,10 @@ export default function ContactPage() {
       {/* Alternative Contact Info */}
       <div className="space-y-2 text-gray-700">
         <p>
-          <strong>Email:</strong> info@safetripexplorer.com
+          <strong>Email:</strong> wen.dev27@gmail.com
         </p>
         <p>
-          <strong>Phone:</strong> +63 912 345 6789
+          <strong>Phone:</strong> +63 976 547 8545
         </p>
         <p>
           <strong>GitHub:</strong>{" "}

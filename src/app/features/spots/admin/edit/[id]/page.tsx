@@ -100,44 +100,56 @@ function AdminEditSpotPage() {
   }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <div className="mb-6">
-        <button
-          onClick={() => router.back()}
-          className="text-blue-600 underline"
-        >
-          ← Back to Dashboard
-        </button>
+    <div className="max-w-3xl mx-auto px-6 py-10">
+      {/* Back */}
+      <button
+        onClick={() => router.back()}
+        className="mb-6 text-sm text-blue-600 hover:underline"
+      >
+        ← Back to Dashboard
+      </button>
+
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Edit Tourist Spot</h1>
+        <p className="text-gray-500 mt-1">
+          Update details, pricing, and images for this location.
+        </p>
       </div>
 
-      <h1 className="text-3xl font-bold mb-6">Edit Tourist Spot</h1>
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {/* Form */}
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-6 bg-white p-6 rounded-xl shadow-sm border"
+      >
+        {/* Title */}
         <div>
           <label className="block text-sm font-medium mb-1">Title</label>
           <input
             {...register("title")}
-            className="w-full p-3 border rounded-lg"
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             required
           />
         </div>
 
+        {/* Description */}
         <div>
           <label className="block text-sm font-medium mb-1">Description</label>
           <textarea
             {...register("description")}
-            className="w-full p-3 border rounded-lg"
             rows={4}
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             required
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        {/* Location & Category */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Location</label>
             <input
               {...register("location")}
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               required
             />
           </div>
@@ -146,27 +158,30 @@ function AdminEditSpotPage() {
             <label className="block text-sm font-medium mb-1">Category</label>
             <input
               {...register("category")}
-              className="w-full p-3 border rounded-lg"
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               required
             />
           </div>
         </div>
 
+        {/* Price */}
         <div>
           <label className="block text-sm font-medium mb-1">Price (₱)</label>
           <input
             type="number"
             {...register("price", { valueAsNumber: true })}
-            className="w-full p-3 border rounded-lg"
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             required
           />
         </div>
 
+        {/* Images */}
         <div>
-          <label className="block text-sm font-medium mb-1">Images</label>
-          <div className="space-y-2">
+          <label className="block text-sm font-medium mb-2">Images</label>
+
+          <div className="space-y-3">
             {images.map((image, index) => (
-              <div key={index} className="flex items-center gap-2">
+              <div key={index} className="flex gap-2">
                 <input
                   type="text"
                   value={image}
@@ -175,27 +190,29 @@ function AdminEditSpotPage() {
                     newImages[index] = e.target.value;
                     setImages(newImages);
                   }}
-                  className="flex-1 p-2 border rounded"
+                  className="flex-1 p-3 border rounded-lg"
                 />
                 <button
                   type="button"
                   onClick={() => removeImage(index)}
-                  className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  className="px-4 bg-red-500 text-white rounded-lg hover:bg-red-600"
                 >
                   Remove
                 </button>
               </div>
             ))}
+
             <button
               type="button"
               onClick={addImage}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="text-sm text-blue-600 hover:underline"
             >
-              Add Image
+              + Add another image
             </button>
           </div>
         </div>
 
+        {/* Amenities */}
         <div>
           <label className="block text-sm font-medium mb-1">
             Amenities (comma-separated)
@@ -203,23 +220,25 @@ function AdminEditSpotPage() {
           <input
             value={amenitiesInput}
             onChange={(e) => setAmenitiesInput(e.target.value)}
-            className="w-full p-3 border rounded-lg"
             placeholder="WiFi, Parking, Restaurant..."
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         </div>
 
-        <div className="flex gap-4">
+        {/* Actions */}
+        <div className="flex gap-4 pt-4">
           <button
             type="submit"
             disabled={saving}
-            className="flex-1 bg-purple-600 text-white py-3 rounded hover:bg-purple-700 disabled:opacity-50"
+            className="flex-1 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 disabled:opacity-50"
           >
             {saving ? "Saving..." : "Update Spot"}
           </button>
+
           <button
             type="button"
             onClick={() => router.back()}
-            className="px-6 py-3 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+            className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
           >
             Cancel
           </button>
