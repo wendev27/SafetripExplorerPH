@@ -66,7 +66,7 @@ export default function SpotPage() {
   };
 
   return (
-    <div className="h-[600px] mt-[100px] flex flex-col justify-between p-6 max-w-4xl mx-auto">
+    <div className="h-min-screen mt-[100px] flex flex-col justify-between p-6 max-w-4xl mx-auto">
       {/* Back Button */}
       <div className="mb-6">
         <button
