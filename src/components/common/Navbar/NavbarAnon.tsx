@@ -4,7 +4,7 @@ import islogo from "../../../../public/islogo.png";
 
 export default function NavbarAnonymous() {
   return (
-    <nav className="bg-blue-600 text-white py-4 px-6 shadow-md flex justify-between items-center">
+    <nav className="bg-blue-900 text-white py-4 px-6 shadow-md flex justify-between items-center">
       {/* Logo */}
       <Link
         href="/"

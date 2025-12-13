@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-r from-blue-600 to-blue-700 text-white pt-10 pb-6 mt-10">
+    <footer className="bg-gradient-to-r from-blue-900 to-blue-600 text-white pt-10 pb-6 mt-10">
       <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 md:gap-0">
         {/* Branding */}
         <div className="flex flex-col items-start md:items-start space-y-2">
@@ -15,9 +15,9 @@ export default function Footer() {
 
         {/* Links */}
         <div className="flex flex-wrap gap-4 md:gap-6">
-          <Link href="/" className="hover:text-gray-300 transition-colors">
+          {/* <Link href="/" className="hover:text-gray-300 transition-colors">
             Home
-          </Link>
+          </Link> */}
 
           <Link
             href="/extra/about"
@@ -39,7 +39,7 @@ export default function Footer() {
             href="#"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-40 transition"
+            className="p-2 rounded-full bg-black bg-opacity-20 hover:bg-opacity-40 transition"
           >
             <svg
               className="w-6 h-6 fill-current hover:text-gray-200 transition-colors"
@@ -53,7 +53,7 @@ export default function Footer() {
             href="#"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-40 transition"
+            className="p-2 rounded-full bg-black bg-opacity-20 hover:bg-opacity-40 transition"
           >
             <svg
               className="w-6 h-6 fill-current hover:text-gray-200 transition-colors"

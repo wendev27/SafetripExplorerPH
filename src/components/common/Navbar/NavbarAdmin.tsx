@@ -34,7 +34,7 @@ export default function NavbarAdmin() {
   }, []);
 
   return (
-    <nav className="bg-blue-700 text-white py-4 px-6 flex justify-between items-center shadow-md">
+    <nav className="bg-blue-900 text-white py-4 px-6 flex justify-between items-center shadow-md">
       {/* Logo + Title */}
       <Link
         href="/features/dashboard/admin"
