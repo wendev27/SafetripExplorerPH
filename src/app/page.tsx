@@ -82,7 +82,7 @@ export default function HomePage() {
             star <= Math.round(rating) ? "text-yellow-400" : "text-gray-300"
           }`}
         >
-          ⭐
+          ★
         </span>
       ))}
       <span className="text-xs text-gray-600 ml-1">({rating.toFixed(1)})</span>
@@ -114,7 +114,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen overflow-auto">
       {/* Hero Section */}
-      <section className="hero relative text-center py-36">
+      <section className="hero relative py-36 flex items-center justify-center text-center">
         <div className="hero-video-container absolute top-0 left-0 w-full h-full overflow-hidden z-0">
           <video
             autoPlay
@@ -127,7 +127,7 @@ export default function HomePage() {
           <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10"></div>
         </div>
 
-        <div className="container relative z-20 text-white">
+        <div className="container relative z-20 text-white max-w-3xl">
           <h1 className="text-5xl font-bold mb-4">Discover the Philippines</h1>
           <p className="text-lg mb-6">
             Experience the Pearl of the Orient Seas with safety and
@@ -135,7 +135,7 @@ export default function HomePage() {
           </p>
           <a
             href="#gallery"
-            className="book-now inline-block py-2 px-6 rounded-full bg-yellow-400 text-blue-900 font-bold"
+            className="inline-block py-2 px-6 rounded-full bg-yellow-400 text-blue-900 font-bold hover:scale-105 transition-transform"
           >
             Explore Our Top Destinations
           </a>
@@ -283,7 +283,7 @@ export default function HomePage() {
           </p>
           <a
             href="#book"
-            className="book-now inline-block py-2 px-6 rounded-full bg-yellow-400 text-blue-900 font-bold"
+            className="inline-block py-2 px-6 rounded-full bg-yellow-400 text-blue-900 font-bold hover:scale-105 transition-transform"
           >
             Get a Quote
           </a>
