@@ -18,9 +18,10 @@ interface Spot {
   createdAt: string;
 }
 
+// 🔧 FIX: use primitive `number`, not `Number`
 interface Loyalty {
   userId: string;
-  points: Number;
+  points: number;
 }
 
 interface Booking {
@@ -60,6 +61,11 @@ export default function AdminDashboard() {
   const [bookingSort, setBookingSort] = useState("newest");
 
   useEffect(() => {
+    // 🔧 FIX: redirect if not logged in
+    if (session === null) {
+      router.push("/");
+      return;
+    }
     if (session?.user) {
       if (activeTab === "spots") {
         fetchSpots();
@@ -124,7 +130,9 @@ export default function AdminDashboard() {
 
     try {
       const response = await fetch(`/api/admin/spots/${spotId}`, {
-        method: "DELETE", // Using DELETE method but for toggling status
+        // method: "DELETE", // Using DELETE method but for toggling status
+        // 🔧 SUGGESTION: use PATCH instead of DELETE for toggle
+        method: "PATCH",
       });
 
       if (response.ok) {
@@ -171,7 +179,8 @@ export default function AdminDashboard() {
     points: number
   ) => {
     try {
-      const response = await fetch("/api/admin/loyalty/${userId}", {
+      // 🔧 FIX: use template string with backticks
+      const response = await fetch(`/api/admin/loyalty/${userId}`, {
         method: "PUT",
       });
     } catch (error) {
@@ -294,8 +303,12 @@ export default function AdminDashboard() {
                       {spots.map((spot) => (
                         <div
                           key={spot._id}
+                          // className={`bg-white rounded-xl shadow hover:shadow-xl transition overflow-hidden border ${
+                          //   !spot.isActive ? "opacity-60 border-red-200" : ""
+                          // }`}
+                          // 🔧 FIX: removed opacity-60 (causes blur)
                           className={`bg-white rounded-xl shadow hover:shadow-xl transition overflow-hidden border ${
-                            !spot.isActive ? "opacity-60 border-red-200" : ""
+                            !spot.isActive ? "border-red-200" : ""
                           }`}
                         >
                           <img

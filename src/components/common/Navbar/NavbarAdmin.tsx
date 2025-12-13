@@ -10,6 +10,9 @@ export default function NavbarAdmin() {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // 🔧 ADDED: close dropdown on navigation
+  const closeMenu = () => setOpen(false);
+
   const handleLogout = async () => {
     logout();
     await signOut({ redirect: false });
@@ -66,6 +69,7 @@ export default function NavbarAdmin() {
             <Link
               href="/features/dashboard/admin"
               className="block px-4 py-2 hover:bg-gray-100 transition"
+              onClick={closeMenu} // 🔧 ADDED
             >
               Dashboard
             </Link>
@@ -73,6 +77,7 @@ export default function NavbarAdmin() {
             <Link
               href="/features/spots/admin/"
               className="block px-4 py-2 hover:bg-gray-100 transition"
+              onClick={closeMenu} // 🔧 ADDED
             >
               Add Spots
             </Link>
