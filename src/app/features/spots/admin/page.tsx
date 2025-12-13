@@ -44,14 +44,16 @@ export default function AdminAddSpotPage() {
       });
 
       if (response.data.success) {
-        alert("Tourist spot added successfully! It will be reviewed by a super admin before being published.");
+        alert(
+          "Tourist spot added successfully! It will be reviewed by a super admin before being published."
+        );
         reset();
         setImages([]);
         setAmenitiesInput("");
         router.push("/features/dashboard/admin");
       }
     } catch (err: any) {
-      console.error('Error creating spot:', err);
+      console.error("Error creating spot:", err);
       alert(err.response?.data?.message || "Something went wrong");
     }
   };
@@ -87,6 +89,8 @@ export default function AdminAddSpotPage() {
         <input
           {...register("category")}
           placeholder="Category"
+          value="Open"
+          disabled
           className="w-full p-3 border rounded"
         />
         <input

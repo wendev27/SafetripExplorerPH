@@ -24,15 +24,10 @@ interface Spot {
     name: string;
     email: string;
     userRole: string;
-  };
+  } | null;
   status: "pending" | "approved" | "rejected";
   isActive: boolean;
-  reviewedBy?: {
-    _id: string;
-    name: string;
-    email: string;
-    userRole: string;
-  };
+  reviewedBy?: { _id: string; name: string; email: string; userRole: string };
   reviewNotes?: string;
   createdAt: string;
 }
@@ -40,36 +35,37 @@ interface Spot {
 interface Booking {
   _id: string;
   status: "pending" | "accepted" | "rejected";
-  userId: {
-    _id: string;
-    name: string;
-    email: string;
-    userRole: string;
-  };
+  userId: { _id: string; name: string; email: string; userRole: string } | null;
   spotId: {
     _id: string;
     title: string;
     location: string;
     price: number;
     ownerId: string;
-  };
+  } | null;
   createdAt: string;
 }
 
-type TabType = "overview" | "users" | "spots" | "bookings";
+interface LogEntry {
+  id: string;
+  message: string;
+  type: "info" | "warning" | "error";
+  timestamp: string;
+}
+
+type TabType = "overview" | "users" | "spots" | "bookings" | "logs";
 
 export default function SuperAdminDashboard() {
   const { data: session } = useSession();
 
   const [activeTab, setActiveTab] = useState<TabType>("overview");
-
   const [users, setUsers] = useState<User[]>([]);
   const [spots, setSpots] = useState<Spot[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
-
+  const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch data depending on active tab
+  // FETCH DATA BASED ON ACTIVE TAB
   useEffect(() => {
     switch (activeTab) {
       case "users":
@@ -81,6 +77,9 @@ export default function SuperAdminDashboard() {
       case "bookings":
         fetchBookings();
         break;
+      case "logs":
+        fetchLogs();
+        break;
     }
   }, [activeTab]);
 
@@ -89,10 +88,12 @@ export default function SuperAdminDashboard() {
     setLoading(true);
     try {
       const res = await fetch("/api/sadmin/users");
+      if (!res.ok) return setUsers([]);
       const data = await res.json();
-      if (data.success) setUsers(data.data);
+      if (data.success) setUsers(data.data || []);
     } catch (err) {
       console.error(err);
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -102,10 +103,12 @@ export default function SuperAdminDashboard() {
     setLoading(true);
     try {
       const res = await fetch("/api/sadmin/spots");
+      if (!res.ok) return setSpots([]);
       const data = await res.json();
-      if (data.success) setSpots(data.data);
+      if (data.success) setSpots(data.data || []);
     } catch (err) {
       console.error(err);
+      setSpots([]);
     } finally {
       setLoading(false);
     }
@@ -115,13 +118,49 @@ export default function SuperAdminDashboard() {
     setLoading(true);
     try {
       const res = await fetch("/api/sadmin/bookings");
+      if (!res.ok) return setBookings([]);
       const data = await res.json();
-      if (data.success) setBookings(data.data);
+      if (data.success) setBookings(data.data || []);
     } catch (err) {
       console.error(err);
+      setBookings([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  // MOCK LOGS (no API)
+  const fetchLogs = () => {
+    setLoading(true);
+    // Just mock some logs
+    const mockLogs: LogEntry[] = [
+      {
+        id: "1",
+        message: "System started successfully.",
+        type: "info",
+        timestamp: new Date().toISOString(),
+      },
+      {
+        id: "2",
+        message: "User john@example.com updated role to admin.",
+        type: "info",
+        timestamp: new Date().toISOString(),
+      },
+      {
+        id: "3",
+        message: "Spot 'Beach Paradise' approved by Super Admin.",
+        type: "warning",
+        timestamp: new Date().toISOString(),
+      },
+      {
+        id: "4",
+        message: "Booking for 'Mountain View' rejected due to invalid payment.",
+        type: "error",
+        timestamp: new Date().toISOString(),
+      },
+    ];
+    setLogs(mockLogs);
+    setLoading(false);
   };
 
   // -------- ACTION FUNCTIONS --------
@@ -207,11 +246,19 @@ export default function SuperAdminDashboard() {
     return "bg-gray-100 text-gray-800";
   };
 
+  const getLogColor = (type: string) => {
+    if (type === "info") return "text-blue-600";
+    if (type === "warning") return "text-yellow-600";
+    if (type === "error") return "text-red-600";
+    return "text-gray-800";
+  };
+
   const tabs = [
     { id: "overview" as TabType, label: "Overview", icon: "📊" },
     { id: "users" as TabType, label: "Manage Users", icon: "👥" },
     { id: "spots" as TabType, label: "Manage Spots", icon: "🏖️" },
     { id: "bookings" as TabType, label: "All Bookings", icon: "📅" },
+    { id: "logs" as TabType, label: "Logs", icon: "📝" },
   ];
 
   return (
@@ -242,7 +289,6 @@ export default function SuperAdminDashboard() {
 
       {/* MAIN CONTENT */}
       <main className="flex-1 p-8 max-w-7xl mx-auto">
-        {/* HEADER */}
         <header className="bg-white rounded-xl shadow p-8 mb-8 border">
           <h1 className="text-3xl font-bold mb-2">Super Admin Dashboard</h1>
           <p className="text-gray-600">Welcome, {session?.user?.name}</p>
@@ -279,7 +325,7 @@ export default function SuperAdminDashboard() {
             </div>
           )}
 
-          {/* USERS TAB */}
+          {/* USERS */}
           {activeTab === "users" && (
             <TableCard
               title="Users"
@@ -326,6 +372,7 @@ export default function SuperAdminDashboard() {
             </TableCard>
           )}
 
+          {/* SPOTS */}
           {activeTab === "spots" && (
             <TableCard
               title="Spots"
@@ -341,10 +388,12 @@ export default function SuperAdminDashboard() {
             >
               {spots.map((spot) => (
                 <tr key={spot._id} className="border-b">
-                  <td className="px-6 py-4">{spot.title}</td>
-                  <td className="px-6 py-4">{spot.location}</td>
-                  <td className="px-6 py-4">₱{spot.price.toLocaleString()}</td>
-                  <td className="px-6 py-4">{spot.ownerId.name}</td>
+                  <td className="px-6 py-4">{spot.title || "N/A"}</td>
+                  <td className="px-6 py-4">{spot.location || "N/A"}</td>
+                  <td className="px-6 py-4">
+                    ₱{spot.price?.toLocaleString() ?? 0}
+                  </td>
+                  <td className="px-6 py-4">{spot.ownerId?.name ?? "N/A"}</td>
                   <td className="px-6 py-4">
                     <span
                       className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
@@ -355,30 +404,37 @@ export default function SuperAdminDashboard() {
                     </span>
                   </td>
                   <td className="px-6 py-4 space-x-2">
-                    <button
-                      onClick={() => approveSpot(spot._id)}
-                      className="bg-green-500 px-2 py-1 text-white rounded text-xs"
-                    >
-                      Approve
-                    </button>
-                    <button
-                      onClick={() => rejectSpot(spot._id)}
-                      className="bg-red-500 px-2 py-1 text-white rounded text-xs"
-                    >
-                      Reject
-                    </button>
-                    <button
-                      onClick={() => toggleSpotStatus(spot._id)}
-                      className="bg-gray-500 px-2 py-1 text-white rounded text-xs"
-                    >
-                      {spot.isActive ? "Disable" : "Enable"}
-                    </button>
+                    {spot.status === "pending" && (
+                      <>
+                        <button
+                          onClick={() => approveSpot(spot._id)}
+                          className="bg-green-500 px-2 py-1 text-white rounded text-xs"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => rejectSpot(spot._id)}
+                          className="bg-red-500 px-2 py-1 text-white rounded text-xs"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                    {spot.status === "approved" && (
+                      <button
+                        onClick={() => toggleSpotStatus(spot._id)}
+                        className="bg-gray-500 px-2 py-1 text-white rounded text-xs"
+                      >
+                        {spot.isActive ? "Disable" : "Enable"}
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
             </TableCard>
           )}
 
+          {/* BOOKINGS */}
           {activeTab === "bookings" && (
             <TableCard
               title="Bookings"
@@ -387,8 +443,10 @@ export default function SuperAdminDashboard() {
             >
               {bookings.map((booking) => (
                 <tr key={booking._id} className="border-b">
-                  <td className="px-6 py-4">{booking.userId.name}</td>
-                  <td className="px-6 py-4">{booking.spotId.title}</td>
+                  <td className="px-6 py-4">{booking.userId?.name ?? "N/A"}</td>
+                  <td className="px-6 py-4">
+                    {booking.spotId?.title ?? "N/A"}
+                  </td>
                   <td className="px-6 py-4">
                     <span
                       className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
@@ -401,6 +459,31 @@ export default function SuperAdminDashboard() {
                   <td className="px-6 py-4">
                     {new Date(booking.createdAt).toLocaleDateString()}
                   </td>
+                </tr>
+              ))}
+            </TableCard>
+          )}
+
+          {/* LOGS */}
+          {activeTab === "logs" && (
+            <TableCard
+              title="System Logs"
+              loading={loading}
+              columns={["Time", "Type", "Message"]}
+            >
+              {logs.map((log) => (
+                <tr key={log.id} className="border-b">
+                  <td className="px-6 py-4">
+                    {new Date(log.timestamp).toLocaleString()}
+                  </td>
+                  <td
+                    className={`px-6 py-4 font-semibold ${getLogColor(
+                      log.type
+                    )}`}
+                  >
+                    {log.type.toUpperCase()}
+                  </td>
+                  <td className="px-6 py-4">{log.message}</td>
                 </tr>
               ))}
             </TableCard>

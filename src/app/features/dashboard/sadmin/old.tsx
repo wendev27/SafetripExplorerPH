@@ -307,7 +307,7 @@ export default function SuperAdminDashboard() {
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <div className="text-center">
             <h1 className="text-3xl font-bold">
-              Super Admin Dashboard - {session?.user?.name}
+              Super Admin Dashboarddsadsad - {session?.user?.name}
             </h1>
 
             <p className="mt-4 text-gray-600">
