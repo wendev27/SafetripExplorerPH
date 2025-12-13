@@ -87,7 +87,7 @@ export default function ContactPage() {
           <strong>Email:</strong> wen.dev27@gmail.com
         </p>
         <p>
-          <strong>Phone:</strong> +63 976 547 8545
+          <strong>Phone:</strong> +63 976 547
         </p>
         <p>
           <strong>GitHub:</strong>{" "}
