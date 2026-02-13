@@ -61,12 +61,23 @@ export default function AdminDashboard() {
   const [bookingSort, setBookingSort] = useState("newest");
 
   useEffect(() => {
-    // 🔧 FIX: redirect if not logged in
+    // 🔒 SECURITY: Check if user is logged in
     if (session === null) {
       router.push("/");
       return;
     }
-    if (session?.user) {
+
+    // 🔒 SECURITY: Check if user has admin role
+    if (session?.user?.userRole !== "admin") {
+      console.error(
+        "🚨 SECURITY: Non-admin user attempted to access admin dashboard",
+      );
+      router.push("/auth/login");
+      return;
+    }
+
+    // ✅ Only proceed if user is authenticated and has admin role
+    if (session?.user && session.user.userRole === "admin") {
       if (activeTab === "spots") {
         fetchSpots();
       } else if (activeTab === "bookings") {
@@ -107,12 +118,12 @@ export default function AdminDashboard() {
 
   const handleToggleSpotStatus = async (
     spotId: string,
-    isCurrentlyActive: boolean
+    isCurrentlyActive: boolean,
   ) => {
     const targetSpot = spots.find((s) => s._id === spotId);
     if (targetSpot && targetSpot.status !== "approved") {
       alert(
-        "You can only enable/disable spots that are approved by the super admin."
+        "You can only enable/disable spots that are approved by the super admin.",
       );
       return;
     }
@@ -123,7 +134,7 @@ export default function AdminDashboard() {
           isCurrentlyActive
             ? "It will no longer be visible to users."
             : "It will become visible to users again."
-        }`
+        }`,
       )
     )
       return;
@@ -142,8 +153,8 @@ export default function AdminDashboard() {
           spots.map((spot) =>
             spot._id === spotId
               ? { ...spot, isActive: !isCurrentlyActive }
-              : spot
-          )
+              : spot,
+          ),
         );
       } else {
         alert(`Failed to ${action} spot`);
@@ -176,7 +187,7 @@ export default function AdminDashboard() {
 
   const addPointsForCompletedBooking = async (
     userId: string,
-    points: number
+    points: number,
   ) => {
     try {
       // 🔧 FIX: use template string with backticks
@@ -332,8 +343,8 @@ export default function AdminDashboard() {
                                     spot.status === "approved"
                                       ? "bg-green-100 text-green-600"
                                       : spot.status === "rejected"
-                                      ? "bg-red-100 text-red-600"
-                                      : "bg-yellow-100 text-yellow-700"
+                                        ? "bg-red-100 text-red-600"
+                                        : "bg-yellow-100 text-yellow-700"
                                   }`}
                                 >
                                   {spot.status}
@@ -374,7 +385,7 @@ export default function AdminDashboard() {
                               <button
                                 onClick={() =>
                                   router.push(
-                                    `/features/spots/user/check-spot/${spot._id}`
+                                    `/features/spots/user/check-spot/${spot._id}`,
                                   )
                                 }
                                 className="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition text-sm"
@@ -384,7 +395,7 @@ export default function AdminDashboard() {
                               <button
                                 onClick={() =>
                                   router.push(
-                                    `/features/spots/admin/edit/${spot._id}`
+                                    `/features/spots/admin/edit/${spot._id}`,
                                   )
                                 }
                                 disabled={spot.status !== "approved"}
@@ -400,7 +411,7 @@ export default function AdminDashboard() {
                                 onClick={() =>
                                   handleToggleSpotStatus(
                                     spot._id,
-                                    spot.isActive
+                                    spot.isActive,
                                   )
                                 }
                                 disabled={spot.status !== "approved"}
@@ -408,8 +419,8 @@ export default function AdminDashboard() {
                                   spot.status !== "approved"
                                     ? "bg-gray-300 cursor-not-allowed"
                                     : spot.isActive
-                                    ? "bg-red-600 hover:bg-red-700"
-                                    : "bg-green-600 hover:bg-green-700"
+                                      ? "bg-red-600 hover:bg-red-700"
+                                      : "bg-green-600 hover:bg-green-700"
                                 }`}
                               >
                                 {spot.isActive ? "Disable" : "Enable"}
@@ -515,15 +526,15 @@ export default function AdminDashboard() {
                                   booking.paymentMethod === "gcash"
                                     ? "bg-blue-100 text-blue-800"
                                     : booking.paymentMethod === "credit_card"
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-yellow-100 text-yellow-800"
+                                      ? "bg-green-100 text-green-800"
+                                      : "bg-yellow-100 text-yellow-800"
                                 }`}
                               >
                                 {booking.paymentMethod === "gcash"
                                   ? "📱 GCash"
                                   : booking.paymentMethod === "credit_card"
-                                  ? "💳 Card"
-                                  : "💵 Cash"}
+                                    ? "💳 Card"
+                                    : "💵 Cash"}
                               </span>
                             </td>
 
@@ -533,10 +544,10 @@ export default function AdminDashboard() {
                                   booking.status === "accepted"
                                     ? "bg-green-100 text-green-800"
                                     : booking.status === "rejected"
-                                    ? "bg-red-100 text-red-800"
-                                    : booking.status === "completed"
-                                    ? "bg-blue-100 text-blue-800"
-                                    : "bg-yellow-100 text-yellow-800"
+                                      ? "bg-red-100 text-red-800"
+                                      : booking.status === "completed"
+                                        ? "bg-blue-100 text-blue-800"
+                                        : "bg-yellow-100 text-yellow-800"
                                 }`}
                               >
                                 {booking.status}
@@ -550,7 +561,7 @@ export default function AdminDashboard() {
                                     onClick={() =>
                                       updateBookingStatus(
                                         booking._id,
-                                        "accepted"
+                                        "accepted",
                                       )
                                     }
                                     className="text-green-600 hover:text-green-900"
@@ -561,7 +572,7 @@ export default function AdminDashboard() {
                                     onClick={() =>
                                       updateBookingStatus(
                                         booking._id,
-                                        "rejected"
+                                        "rejected",
                                       )
                                     }
                                     className="text-red-600 hover:text-red-900"
@@ -576,7 +587,7 @@ export default function AdminDashboard() {
                                   onClick={() =>
                                     updateBookingStatus(
                                       booking._id,
-                                      "completed"
+                                      "completed",
                                     )
                                   }
                                   className="text-blue-600 hover:text-blue-900"

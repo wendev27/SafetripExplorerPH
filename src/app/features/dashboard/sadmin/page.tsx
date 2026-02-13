@@ -68,19 +68,25 @@ export default function SuperAdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 🔧 FIX: redirect if not logged in
+    // � SECURITY: Check if user is logged in
     if (session === null) {
       router.push("/");
       return;
     }
 
-    // Only allow superadmin to access this page
+    // 🔒 SECURITY: Only allow superadmin to access this page
     if (session?.user?.userRole !== "superadmin") {
-      router.push("/");
+      console.error(
+        "🚨 SECURITY: Non-superadmin user attempted to access superadmin dashboard",
+      );
+      router.push("/auth/login");
       return;
     }
 
-    fetchOverviewData();
+    // ✅ Only proceed if user is authenticated and has superadmin role
+    if (session?.user && session.user.userRole === "superadmin") {
+      fetchOverviewData();
+    }
   }, [session]);
 
   // FETCH DATA BASED ON ACTIVE TAB
