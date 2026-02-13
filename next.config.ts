@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
-  // SECURITY: Additional security headers via Next.js config
+  // SECURITY: Comprehensive security headers for production deployment
   async headers() {
     return [
       {
@@ -25,21 +25,23 @@ const nextConfig: NextConfig = {
             ? [
                 {
                   key: "Strict-Transport-Security",
-                  value: "max-age=63072000; includeSubDomains; preload",
+                  value: "max-age=31536000; includeSubDomains; preload",
                 },
               ]
             : []),
-          // SECURITY: Tightened CSP for production security
+          // SECURITY: Enhanced CSP for comprehensive XSS protection
           {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: https:",
+              "img-src 'self' blob: data: https:",
+              "font-src 'self'",
               "connect-src 'self' https:",
               "frame-ancestors 'none'",
               "base-uri 'self'",
+              "form-action 'self'",
             ].join("; "),
           },
         ],
