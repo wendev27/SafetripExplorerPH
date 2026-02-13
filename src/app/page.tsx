@@ -30,19 +30,28 @@ export default function HomePage() {
   const fetchSpotsWithReviews = async () => {
     setLoading(true);
     try {
+      console.log("🔍 Fetching spots from API...");
       const spotsRes = await fetch("/api/shared/spots");
 
       if (!spotsRes.ok) {
+        console.error(
+          "❌ API Response Error:",
+          spotsRes.status,
+          spotsRes.statusText,
+        );
         throw new Error(`HTTP error! status: ${spotsRes.status}`);
       }
 
       const spotsData = await spotsRes.json();
+      console.log("📊 API Response Data:", spotsData);
 
       if (!spotsData.success) {
+        console.error("❌ API Success Error:", spotsData.message);
         throw new Error(spotsData.message || "Failed to fetch spots");
       }
 
       const spotsList = spotsData.data || [];
+      console.log("✅ Spots fetched:", spotsList.length, "spots");
 
       const spotsWithReviews = await Promise.all(
         spotsList.map(async (spot: Spot) => {
@@ -66,9 +75,10 @@ export default function HomePage() {
         }),
       );
 
+      console.log("🎯 Final spots with reviews:", spotsWithReviews.length);
       setSpots(spotsWithReviews);
     } catch (error) {
-      console.error("Error fetching spots:", error);
+      console.error("💥 Critical Error in fetchSpotsWithReviews:", error);
       setSpots([]);
     } finally {
       setLoading(false);
