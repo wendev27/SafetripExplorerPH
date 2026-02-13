@@ -125,19 +125,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen overflow-auto">
       {/* Hero Section */}
-      <section className="hero relative py-36 flex items-center justify-center text-center">
-        <div className="hero-video-container absolute top-0 left-0 w-full h-full overflow-hidden z-0">
-          <video
-            autoPlay
-            muted
-            loop
-            className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto transform -translate-x-1/2 -translate-y-1/2 object-cover"
-          >
-            <source src="welcome.mp4" type="video/mp4" />
-          </video>
-          <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10"></div>
-        </div>
-
+      <section className="hero relative py-36 flex items-center justify-center text-center bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800">
         <div className="container relative z-20 text-white max-w-3xl">
           <h1 className="text-5xl font-bold mb-4">Discover the Philippines</h1>
           <p className="text-lg mb-6">
