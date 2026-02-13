@@ -111,13 +111,14 @@ export default function HomePage() {
       title: "Boracay",
       description:
         "World-famous White Beach with powdery sand and vibrant nightlife.",
-      image: "/qw.jpg",
+      image:
+        "https://images.unsplash.com/photo-1506905925346-567c2f12c5e5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg",
     },
     {
       title: "Bohol",
-      description:
-        "The mysterious Chocolate Hills formation and the tiny Tarsier.",
-      image: "/as.jpg",
+      description: "The mysterious Chocolate Hills formation and tiny Tarsier.",
+      image:
+        "https://images.unsplash.com/photo-1547193975-5e79e31d2f3f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg",
     },
   ];
 
