@@ -120,12 +120,31 @@ export default function HomePage() {
       image:
         "https://images.unsplash.com/photo-1547193975-5e79e31d2f3f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg",
     },
+    {
+      title: "Cebu",
+      description:
+        "A bustling metropolis with a rich history and beautiful beaches.",
+      image:
+        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg",
+    },
   ];
 
   return (
     <div className="min-h-screen overflow-auto">
       {/* Hero Section */}
-      <section className="hero relative py-36 flex items-center justify-center text-center bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800">
+      <section className="hero relative py-36 flex items-center justify-center text-center">
+        <div className="hero-video-container absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+          <video
+            autoPlay
+            muted
+            loop
+            className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto transform -translate-x-1/2 -translate-y-1/2 object-cover"
+          >
+            <source src="welcome.mp4" type="video/mp4" />
+          </video>
+          <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10"></div>
+        </div>
+
         <div className="container relative z-20 text-white max-w-3xl">
           <h1 className="text-5xl font-bold mb-4">Discover the Philippines</h1>
           <p className="text-lg mb-6">
