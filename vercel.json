@@ -2,10 +2,5 @@
   "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "installCommand": "npm install",
-  "framework": "nextjs",
-  "env": {
-    "NEXTAUTH_URL": "@next-auth-url",
-    "NEXTAUTH_SECRET": "@next-auth-secret",
-    "MONGODB_URI": "@mongodb-uri"
-  }
+  "framework": "nextjs"
 }
