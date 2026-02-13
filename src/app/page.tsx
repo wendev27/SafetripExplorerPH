@@ -31,7 +31,17 @@ export default function HomePage() {
     setLoading(true);
     try {
       const spotsRes = await fetch("/api/shared/spots");
+
+      if (!spotsRes.ok) {
+        throw new Error(`HTTP error! status: ${spotsRes.status}`);
+      }
+
       const spotsData = await spotsRes.json();
+
+      if (!spotsData.success) {
+        throw new Error(spotsData.message || "Failed to fetch spots");
+      }
+
       const spotsList = spotsData.data || [];
 
       const spotsWithReviews = await Promise.all(
@@ -49,11 +59,11 @@ export default function HomePage() {
           } catch (error) {
             console.error(
               `Error fetching reviews for spot ${spot._id}:`,
-              error
+              error,
             );
           }
           return spot;
-        })
+        }),
       );
 
       setSpots(spotsWithReviews);

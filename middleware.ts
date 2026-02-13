@@ -11,6 +11,8 @@ const publicRoutes = [
   "/signup",
   "/auth/register",
   "/api/auth",
+  "/api/shared",
+  "/api/reviews",
   "/extra/contact",
   "/extra/about",
 ];
