@@ -1,10 +1,17 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import { getServerSession } from "next-auth";
+import { z } from "zod";
+import mongoose from "mongoose";
 import { authOptions } from "../../auth/[...nextauth]/route";
 
 import UserApplication from "@/services/models/UserApplication";
 import User from "@/services/models/User";
+
+// SECURITY: Shared schema for user applications.
+const sharedApplicationSchema = z.object({
+  spotId: z.string().min(1),
+});
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
@@ -15,13 +22,31 @@ export async function POST(req: Request) {
       { status: 401 }
     );
 
-  const body = await req.json();
+  const json = await req.json();
+
+  const parsed = sharedApplicationSchema.safeParse(json);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { success: false, message: "Invalid application data" },
+      { status: 400 }
+    );
+  }
+
+  const { spotId } = parsed.data;
+
+  // SECURITY: Ensure we only accept valid MongoDB ObjectIds.
+  if (!mongoose.Types.ObjectId.isValid(spotId)) {
+    return NextResponse.json(
+      { success: false, message: "Invalid spot ID" },
+      { status: 400 }
+    );
+  }
 
   try {
     await connectDB();
 
     const newApp = await UserApplication.create({
-      spotId: body.spotId,
+      spotId,
       userId: session.user.id,
       status: "pending",
     });

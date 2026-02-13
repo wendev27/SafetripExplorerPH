@@ -4,64 +4,61 @@ import { authOptions } from "../../../auth/[...nextauth]/route";
 import TouristSpot from "@/services/models/TouristSpot";
 import connectDB from "@/lib/db";
 import mongoose from "mongoose";
+import { requireSuperAdmin } from "@/lib/authz";
+import { z } from "zod";
+import { logApiError, internalError } from "@/lib/api-errors";
+
+// SECURITY: Schema for spot approval/rejection
+const spotApprovalSchema = z.object({
+  action: z.enum(["approve", "reject"]),
+  reviewNotes: z.string().max(500).optional(),
+});
 
 export async function PATCH(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user || session.user.userRole !== "superadmin") {
-    return NextResponse.json(
-      { success: false, message: "Unauthorized" },
-      { status: 401 }
-    );
-  }
+  const authResp = requireSuperAdmin(session);
+  if (authResp) return authResp;
 
   const { id } = await params;
 
-  console.log("Spot ID to update:", id);
+  // SECURITY: Validate ObjectId format first
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return NextResponse.json(
+      { success: false, message: "Invalid spot ID" },
+      { status: 400 },
+    );
+  }
 
   try {
     await connectDB();
     const body = await req.json();
-    const { action, reviewNotes } = body;
+    const parsed = spotApprovalSchema.safeParse(body);
 
-    console.log("Approval request body:", body);
-    console.log("Session user ID:", session.user?.id);
-
-    if (!action || !["approve", "reject"].includes(action)) {
+    if (!parsed.success) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "Invalid action. Must be 'approve' or 'reject'",
-        },
-        { status: 400 }
+        { success: false, message: "Invalid approval data" },
+        { status: 400 },
       );
     }
 
-    if (!session.user?.id) {
+    const { action, reviewNotes } = parsed.data;
+
+    if (!session!.user?.id) {
       return NextResponse.json(
         { success: false, message: "User session invalid" },
-        { status: 401 }
-      );
-    }
-
-    // Validate the spot ID
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return NextResponse.json(
-        { success: false, message: "Invalid spot ID" },
-        { status: 400 }
+        { status: 401 },
       );
     }
 
     const updateData: any = {
       status: action === "approve" ? "approved" : "rejected",
-      reviewedBy: session.user.id, // Store as string
+      reviewedBy: session!.user.id, // Store as string
       reviewNotes: reviewNotes || "",
     };
-
-    console.log("Update data:", updateData);
 
     const updatedSpot = await TouristSpot.findByIdAndUpdate(id, updateData, {
       new: true,
@@ -71,12 +68,10 @@ export async function PATCH(
       select: "name email role",
     });
 
-    console.log("Updated spot result:", updatedSpot ? "found" : "not found");
-
     if (!updatedSpot) {
       return NextResponse.json(
         { success: false, message: "Spot not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -100,48 +95,58 @@ export async function PATCH(
       message: `Spot ${action}d successfully`,
     });
   } catch (error) {
-    console.error("Error updating spot status:", error);
-    console.error("Session user:", session.user);
-    console.error("Session user ID:", session.user?.id);
-    return NextResponse.json(
-      { success: false, message: "Server Error" },
-      { status: 500 }
-    );
+    logApiError("sadmin/spots/[id] PATCH", error);
+    return internalError("Error updating spot status");
   }
 }
 
 export async function PUT(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user || session.user.userRole !== "superadmin") {
-    return NextResponse.json(
-      { success: false, message: "Unauthorized" },
-      { status: 401 }
-    );
-  }
+  const authResp = requireSuperAdmin(session);
+  if (authResp) return authResp;
 
   const { id } = await params;
+
+  // SECURITY: Validate ObjectId format first
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return NextResponse.json(
+      { success: false, message: "Invalid spot ID" },
+      { status: 400 },
+    );
+  }
 
   try {
     await connectDB();
     const body = await req.json();
 
-    const updatedSpot = await TouristSpot.findByIdAndUpdate(
-      id,
-      {
-        title: body.title,
-        description: body.description,
-        location: body.location,
-        category: body.category,
-        price: body.price,
-        images: body.images,
-        amenities: body.amenities,
-      },
-      { new: true }
-    ).populate({
+    // SECURITY: Use the same schema as admin spots for consistency
+    const updateSpotSchema = z.object({
+      title: z.string().min(1).max(150).optional(),
+      description: z.string().min(1).max(2000).optional(),
+      location: z.string().min(1).max(255).optional(),
+      category: z.string().min(1).max(100).optional(),
+      price: z.number().positive().optional(),
+      images: z.array(z.string()).optional(),
+      amenities: z.array(z.string()).optional(),
+    });
+
+    const parsed = updateSpotSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { success: false, message: "Invalid spot data" },
+        { status: 400 },
+      );
+    }
+
+    // SECURITY: Whitelisted update - only update allowed fields
+    const updateData = parsed.data;
+    const updatedSpot = await TouristSpot.findByIdAndUpdate(id, updateData, {
+      new: true,
+    }).populate({
       path: "ownerId",
       model: "User",
       select: "name email role",
@@ -150,7 +155,7 @@ export async function PUT(
     if (!updatedSpot) {
       return NextResponse.json(
         { success: false, message: "Spot not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -170,25 +175,29 @@ export async function PUT(
     console.error("Error updating spot:", error);
     return NextResponse.json(
       { success: false, message: "Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user || session.user.userRole !== "superadmin") {
-    return NextResponse.json(
-      { success: false, message: "Unauthorized" },
-      { status: 401 }
-    );
-  }
+  const authResp = requireSuperAdmin(session);
+  if (authResp) return authResp;
 
   const { id } = await params;
+
+  // SECURITY: Validate ObjectId format first
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return NextResponse.json(
+      { success: false, message: "Invalid spot ID" },
+      { status: 400 },
+    );
+  }
 
   try {
     await connectDB();
@@ -203,7 +212,7 @@ export async function DELETE(
     if (!spot) {
       return NextResponse.json(
         { success: false, message: "Spot not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -232,7 +241,7 @@ export async function DELETE(
     console.error("Error toggling spot status:", error);
     return NextResponse.json(
       { success: false, message: "Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

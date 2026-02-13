@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface Application {
   _id: string;
@@ -32,19 +33,26 @@ interface LoyaltyData {
 
 export default function Dashboard() {
   const { data: session } = useSession();
+  const router = useRouter();
   const [applications, setApplications] = useState<Application[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loyaltyData, setLoyaltyData] = useState<LoyaltyData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showReviewModal, setShowReviewModal] = useState(false);
-  const [selectedBooking, setSelectedBooking] = useState<Application | null>(
-    null
-  );
+  const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState("");
-  const [submittingReview, setSubmittingReview] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<Application | null>(
+    null,
+  );
 
   useEffect(() => {
+    // 🔧 FIX: redirect if not logged in
+    if (session === null) {
+      router.push("/");
+      return;
+    }
+
     if (session?.user) {
       fetchApplications();
       fetchReviews();
@@ -114,7 +122,7 @@ export default function Dashboard() {
       if (data.success) {
         alert(
           data.message ||
-            "Review submitted successfully! You've earned 1 loyalty point!"
+            "Review submitted successfully! You've earned 1 loyalty point!",
         );
         setShowReviewModal(false);
         setSelectedBooking(null);
@@ -223,7 +231,7 @@ export default function Dashboard() {
                       <h3 className="text-xl font-semibold">{spot.title}</h3>
                       <span
                         className={`text-xs px-2 py-1 rounded capitalize ${getStatusColor(
-                          application.status
+                          application.status,
                         )}`}
                       >
                         {application.status}

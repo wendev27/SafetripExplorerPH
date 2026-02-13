@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { z } from "zod";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import LoyaltyPoints from "@/services/models/LoyaltyPoints";
 import connectDB from "@/lib/db";
+
+// SECURITY: Server-side validation for loyalty point updates.
+const loyaltyUpdateSchema = z.object({
+  increment: z.number().int().min(0).default(1),
+});
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -10,7 +16,7 @@ export async function GET() {
   if (!session?.user) {
     return NextResponse.json(
       { success: false, message: "Unauthorized" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -42,7 +48,7 @@ export async function GET() {
         success: false,
         message: "Server Error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -53,22 +59,23 @@ export async function PUT(request: Request) {
   if (!session?.user) {
     return NextResponse.json(
       { success: false, message: "Unauthorized" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
   try {
     await connectDB();
-    const body = await request.json();
-    const { increment = 1 } = body; // Default increment by 1
+    const json = await request.json();
+    const parsed = loyaltyUpdateSchema.safeParse(json);
 
-    // Validate increment value
-    if (typeof increment !== "number" || increment < 0) {
+    if (!parsed.success) {
       return NextResponse.json(
-        { success: false, message: "Invalid increment value" },
-        { status: 400 }
+        { success: false, message: "Invalid loyalty update data" },
+        { status: 400 },
       );
     }
+
+    const { increment } = parsed.data;
 
     // Get or create user's loyalty points record
     let loyaltyData = await LoyaltyPoints.findOne({ userId: session.user.id });
@@ -100,7 +107,7 @@ export async function PUT(request: Request) {
         success: false,
         message: "Server Error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

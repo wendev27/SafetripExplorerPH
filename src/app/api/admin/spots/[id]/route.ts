@@ -3,10 +3,24 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import TouristSpot from "@/services/models/TouristSpot";
 import connectDB from "@/lib/db";
+import { requireAdmin } from "@/lib/authz";
+import { z } from "zod";
+import mongoose from "mongoose";
+
+// SECURITY: Schema for updating spot data
+const updateSpotSchema = z.object({
+  title: z.string().min(1).max(150).optional(),
+  description: z.string().min(1).max(2000).optional(),
+  location: z.string().min(1).max(255).optional(),
+  category: z.string().min(1).max(100).optional(),
+  price: z.number().positive().optional(),
+  images: z.array(z.string()).optional(),
+  amenities: z.array(z.string()).optional(),
+});
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const session = await getServerSession(authOptions);
@@ -14,7 +28,7 @@ export async function GET(
   if (!session?.user || session.user.userRole !== "admin") {
     return NextResponse.json(
       { success: false, message: "Unauthorized" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -30,7 +44,7 @@ export async function GET(
     if (!spot) {
       return NextResponse.json(
         { success: false, message: "Spot not found or access denied" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -39,14 +53,14 @@ export async function GET(
     console.error("Error fetching spot:", error);
     return NextResponse.json(
       { success: false, message: "Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const session = await getServerSession(authOptions);
@@ -54,7 +68,7 @@ export async function PUT(
   if (!session?.user || session.user.userRole !== "admin") {
     return NextResponse.json(
       { success: false, message: "Unauthorized" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -62,41 +76,40 @@ export async function PUT(
     await connectDB();
 
     const body = await req.json();
+    const parsed = updateSpotSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { success: false, message: "Invalid spot data" },
+        { status: 400 },
+      );
+    }
 
     // Find the spot and check if it belongs to the admin
     const existingSpot = await TouristSpot.findOne({
       _id: id,
-      ownerId: session.user.id,
+      ownerId: session!.user.id,
     });
 
     if (!existingSpot) {
       return NextResponse.json(
         { success: false, message: "Spot not found or access denied" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     if (existingSpot.status !== "approved") {
       return NextResponse.json(
         { success: false, message: "Only approved spots can be edited" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    // Update the spot
-    const updatedSpot = await TouristSpot.findByIdAndUpdate(
-      id,
-      {
-        title: body.title,
-        description: body.description,
-        location: body.location,
-        category: body.category,
-        price: body.price,
-        images: body.images,
-        amenities: body.amenities,
-      },
-      { new: true }
-    );
+    // SECURITY: Whitelisted update - only update allowed fields
+    const updateData = parsed.data;
+    const updatedSpot = await TouristSpot.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
 
     return NextResponse.json({
       success: true,
@@ -107,14 +120,14 @@ export async function PUT(
     console.error("Error updating spot:", error);
     return NextResponse.json(
       { success: false, message: "Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const session = await getServerSession(authOptions);
@@ -122,7 +135,7 @@ export async function DELETE(
   if (!session?.user || session.user.userRole !== "admin") {
     return NextResponse.json(
       { success: false, message: "Unauthorized" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -138,7 +151,7 @@ export async function DELETE(
     if (!spot) {
       return NextResponse.json(
         { success: false, message: "Spot not found or access denied" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -148,7 +161,7 @@ export async function DELETE(
           success: false,
           message: "Only approved spots can be enabled/disabled",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -156,7 +169,7 @@ export async function DELETE(
     const updatedSpot = await TouristSpot.findByIdAndUpdate(
       id,
       [{ $set: { isActive: { $not: "$isActive" } } }],
-      { new: true }
+      { new: true },
     );
 
     const action = updatedSpot?.isActive ? "enabled" : "disabled";
@@ -169,7 +182,7 @@ export async function DELETE(
     console.error("Error deleting spot:", error);
     return NextResponse.json(
       { success: false, message: "Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

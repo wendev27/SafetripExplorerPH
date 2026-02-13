@@ -29,9 +29,50 @@ declare module "next-auth" {
 }
 
 /**
+ * SECURITY: Ensure we always have a strong secret in production.
+ * Fail fast instead of silently generating one per boot, which breaks sessions.
+ */
+const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET;
+if (!NEXTAUTH_SECRET && process.env.NODE_ENV === "production") {
+  // Throwing here stops the app from starting with an unsafe config.
+  throw new Error(
+    "NEXTAUTH_SECRET is required in production for secure session signing."
+  );
+}
+
+/**
  * Auth options for NextAuth
  */
 export const authOptions: AuthOptions = {
+  /**
+   * SECURITY: Explicit session configuration — we use JWTs with a bounded lifetime.
+   */
+  session: {
+    strategy: "jwt",
+    // 7 days max session lifetime; tune as needed for your policy.
+    maxAge: 60 * 60 * 24 * 7,
+    // Re-issue the session token at most once per day.
+    updateAge: 60 * 60 * 24,
+  },
+  /**
+   * SECURITY: Explicit cookie hardening.
+   * NextAuth has sane defaults, but we lock them in so they can't be
+   * accidentally weakened by future config changes.
+   */
+  cookies: {
+    sessionToken: {
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Secure-next-auth.session-token"
+          : "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+  },
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -51,20 +92,21 @@ export const authOptions: AuthOptions = {
         };
 
         if (!email || !password) {
-          throw new Error("Missing email or password");
+          // SECURITY: Generic message to avoid account enumeration.
+          throw new Error("Invalid email or password");
         }
 
         // find user in MongoDB (lean -> plain object)
         const user = await UserModel.findOne({ email }).lean();
         if (!user) {
           // NextAuth will surface this as an error and redirect to /api/auth/error
-          throw new Error("User not found");
+          throw new Error("Invalid email or password");
         }
 
         // compare hashed password
         const isValid = await compare(password, user.password);
         if (!isValid) {
-          throw new Error("Wrong password");
+          throw new Error("Invalid email or password");
         }
 
         // return a plain object; include both the generic role (string) and strict userRole
@@ -114,8 +156,8 @@ export const authOptions: AuthOptions = {
     error: "/auth/login",
   },
 
-  // use a real secret in production
-  secret: process.env.NEXTAUTH_SECRET,
+  // SECURITY: use a strong, env-provided secret for signing.
+  secret: NEXTAUTH_SECRET,
 };
 
 // Export GET + POST for App Router route file

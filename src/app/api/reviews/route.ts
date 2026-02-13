@@ -1,9 +1,19 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { z } from "zod";
+import mongoose from "mongoose";
 import { authOptions } from "../auth/[...nextauth]/route";
 import Review from "@/services/models/Review";
 import UserApplication from "@/services/models/UserApplication";
 import connectDB from "@/lib/db";
+
+// SECURITY: Schema for creating reviews.
+const reviewSchema = z.object({
+  bookingId: z.string().min(1),
+  rating: z.number().int().min(1).max(5),
+  comment: z.string().min(1).max(500),
+  isAnonymous: z.boolean().optional(),
+});
 
 export async function GET(request: Request) {
   try {
@@ -14,6 +24,14 @@ export async function GET(request: Request) {
     if (!spotId) {
       return NextResponse.json(
         { success: false, message: "spotId parameter is required" },
+        { status: 400 }
+      );
+    }
+
+    // SECURITY: Validate the spotId as an ObjectId to avoid malformed queries.
+    if (!mongoose.Types.ObjectId.isValid(spotId)) {
+      return NextResponse.json(
+        { success: false, message: "Invalid spotId parameter" },
         { status: 400 }
       );
     }
@@ -62,20 +80,25 @@ export async function POST(request: Request) {
 
   try {
     await connectDB();
-    const body = await request.json();
-    const { bookingId, rating, comment, isAnonymous = false } = body;
+    const json = await request.json();
+    const parsed = reviewSchema.safeParse(json);
 
-    // Validate required fields
-    if (!bookingId || !rating || !comment) {
+    if (!parsed.success) {
       return NextResponse.json(
-        { success: false, message: "bookingId, rating, and comment are required" },
+        {
+          success: false,
+          message: "Invalid review data",
+        },
         { status: 400 }
       );
     }
 
-    if (rating < 1 || rating > 5) {
+    const { bookingId, rating, comment, isAnonymous = false } = parsed.data;
+
+    // SECURITY: Validate bookingId format
+    if (!mongoose.Types.ObjectId.isValid(bookingId)) {
       return NextResponse.json(
-        { success: false, message: "Rating must be between 1 and 5" },
+        { success: false, message: "Invalid booking ID" },
         { status: 400 }
       );
     }
@@ -108,9 +131,9 @@ export async function POST(request: Request) {
       bookingId,
       userId: session.user.id,
       spotId: booking.spotId,
-      rating: Number(rating),
+      rating,
       comment: comment.trim(),
-      isAnonymous
+      isAnonymous,
     });
 
     return NextResponse.json({

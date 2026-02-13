@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface User {
   _id: string;
@@ -57,13 +58,30 @@ type TabType = "overview" | "users" | "spots" | "bookings" | "logs";
 
 export default function SuperAdminDashboard() {
   const { data: session } = useSession();
+  const router = useRouter();
 
   const [activeTab, setActiveTab] = useState<TabType>("overview");
   const [users, setUsers] = useState<User[]>([]);
   const [spots, setSpots] = useState<Spot[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // 🔧 FIX: redirect if not logged in
+    if (session === null) {
+      router.push("/");
+      return;
+    }
+
+    // Only allow superadmin to access this page
+    if (session?.user?.userRole !== "superadmin") {
+      router.push("/");
+      return;
+    }
+
+    fetchOverviewData();
+  }, [session]);
 
   // FETCH DATA BASED ON ACTIVE TAB
   useEffect(() => {
@@ -84,6 +102,18 @@ export default function SuperAdminDashboard() {
   }, [activeTab]);
 
   // -------- FETCH FUNCTIONS --------
+  const fetchOverviewData = async () => {
+    setLoading(true);
+    try {
+      // Fetch initial data for overview
+      await Promise.all([fetchUsers(), fetchSpots(), fetchBookings()]);
+    } catch (err) {
+      console.error("Error fetching overview data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -341,7 +371,7 @@ export default function SuperAdminDashboard() {
                   <td className="px-6 py-4">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-semibold ${getRoleColor(
-                        user.userRole
+                        user.userRole,
                       )}`}
                     >
                       {user.userRole}
@@ -397,7 +427,7 @@ export default function SuperAdminDashboard() {
                   <td className="px-6 py-4">
                     <span
                       className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
-                        spot.status
+                        spot.status,
                       )}`}
                     >
                       {spot.status}
@@ -450,7 +480,7 @@ export default function SuperAdminDashboard() {
                   <td className="px-6 py-4">
                     <span
                       className={`px-2 py-1 text-xs rounded-full ${getStatusColor(
-                        booking.status
+                        booking.status,
                       )}`}
                     >
                       {booking.status}
@@ -478,7 +508,7 @@ export default function SuperAdminDashboard() {
                   </td>
                   <td
                     className={`px-6 py-4 font-semibold ${getLogColor(
-                      log.type
+                      log.type,
                     )}`}
                   >
                     {log.type.toUpperCase()}

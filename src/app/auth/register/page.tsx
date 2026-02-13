@@ -7,6 +7,7 @@ import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useApiToast } from "@/hooks/use-api-toast";
 
 // ZOD VALIDATION
 const signupSchema = z
@@ -25,6 +26,7 @@ type SignupInputs = z.infer<typeof signupSchema>;
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { apiCall } = useApiToast();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -34,16 +36,23 @@ export default function RegisterPage() {
   });
 
   const onSubmit = async (data: SignupInputs) => {
-    try {
-      await axios.post("/api/auth/signup", {
-        name: data.name,
-        email: data.email,
-        password: data.password,
-      });
-      router.push("/auth/login");
-    } catch (err: any) {
-      alert(err.response?.data?.message || "Something went wrong");
-    }
+    const result = await apiCall(
+      () =>
+        axios.post("/api/auth/signup", {
+          name: data.name,
+          email: data.email,
+          password: data.password,
+        }),
+      {
+        successMessage: "Account created successfully! Redirecting to login...",
+        errorMessage: "Failed to create account. Please try again.",
+        onSuccess: () => {
+          setTimeout(() => {
+            router.push("/auth/login");
+          }, 1500);
+        },
+      },
+    );
   };
 
   return (

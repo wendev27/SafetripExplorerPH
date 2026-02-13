@@ -3,16 +3,13 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import TouristSpot from "@/services/models/TouristSpot";
 import connectDB from "@/lib/db";
+import { requireSuperAdmin } from "@/lib/authz";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user || session.user.userRole !== "superadmin") {
-    return NextResponse.json(
-      { success: false, message: "Unauthorized" },
-      { status: 401 }
-    );
-  }
+  const authResp = requireSuperAdmin(session);
+  if (authResp) return authResp;
 
   try {
     await connectDB();
@@ -30,7 +27,7 @@ export async function GET() {
       const spotObj = spot.toObject();
       return {
         ...spotObj,
-        status: spotObj.status || 'pending', // Default to pending if status is missing
+        status: spotObj.status || "pending", // Default to pending if status is missing
         ownerId: spot.ownerId
           ? {
               ...spot.ownerId.toObject(),
@@ -45,7 +42,7 @@ export async function GET() {
     console.error("Error fetching all spots:", error);
     return NextResponse.json(
       { success: false, message: "Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -7,6 +7,7 @@ import { signIn, getSession } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useApiToast } from "@/hooks/use-api-toast";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -17,31 +18,42 @@ type LoginInputs = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const [error, setError] = useState("");
+  const { apiCall } = useApiToast();
+
   const { register, handleSubmit, formState } = useForm<LoginInputs>({
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (data: LoginInputs) => {
-    const res = await signIn("credentials", {
-      redirect: false,
-      email: data.email,
-      password: data.password,
-    });
+    const result = await apiCall(
+      async () => {
+        const res = await signIn("credentials", {
+          redirect: false,
+          email: data.email,
+          password: data.password,
+        });
 
-    if (res?.error) {
-      setError(res.error);
-    } else {
-      const session = await getSession();
+        if (res?.error) {
+          throw new Error(res.error);
+        }
 
-      if (session?.user?.userRole === "superadmin") {
-        router.push("/features/dashboard/sadmin");
-      } else if (session?.user?.userRole === "admin") {
-        router.push("/features/dashboard/admin");
-      } else {
-        router.push("/");
-      }
-    }
+        const session = await getSession();
+
+        if (session?.user?.userRole === "superadmin") {
+          router.push("/features/dashboard/sadmin");
+        } else if (session?.user?.userRole === "admin") {
+          router.push("/features/dashboard/admin");
+        } else {
+          router.push("/");
+        }
+
+        return session;
+      },
+      {
+        successMessage: "Login successful! Redirecting to dashboard...",
+        errorMessage: "Invalid credentials. Please try again.",
+      },
+    );
   };
 
   return (
@@ -53,10 +65,6 @@ export default function LoginPage() {
         <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">
           Welcome Back
         </h1>
-
-        {error && (
-          <p className="text-red-600 mb-4 text-center font-medium">{error}</p>
-        )}
 
         {/* Email */}
         <div className="mb-5">
