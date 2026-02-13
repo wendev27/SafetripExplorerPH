@@ -128,14 +128,7 @@ export default function HomePage() {
       title: "Bohol",
       description: "The mysterious Chocolate Hills formation and tiny Tarsier.",
       image:
-        "https://images.unsplash.com/photo-1547193975-5e79e31d2f3f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg",
-    },
-    {
-      title: "Cebu",
-      description:
-        "A bustling metropolis with a rich history and beautiful beaches.",
-      image:
-        "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg",
+        "https://images.unsplash.com/photo-1514429753-0f5f5a4f6d6a0f6a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg",
     },
   ];
 
