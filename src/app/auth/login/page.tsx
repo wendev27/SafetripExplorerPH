@@ -3,8 +3,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { signIn, getSession } from "next-auth/react";
-import { useState } from "react";
+import { signIn, getSession, useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useApiToast } from "@/hooks/use-api-toast";
@@ -17,8 +17,18 @@ const loginSchema = z.object({
 type LoginInputs = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  const { data: session } = useSession();
   const router = useRouter();
   const { apiCall } = useApiToast();
+
+  // 🔒 SECURITY: Redirect logged-in users away from login page
+  useEffect(() => {
+    if (session?.user) {
+      console.log("🔒 SECURITY: Logged-in user redirected from login page");
+      router.push("/");
+      return;
+    }
+  }, [session, router]);
 
   const { register, handleSubmit, formState } = useForm<LoginInputs>({
     resolver: zodResolver(loginSchema),

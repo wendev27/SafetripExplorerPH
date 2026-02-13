@@ -6,7 +6,8 @@ import { z } from "zod";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { useApiToast } from "@/hooks/use-api-toast";
 
 // ZOD VALIDATION
@@ -25,8 +26,18 @@ const signupSchema = z
 type SignupInputs = z.infer<typeof signupSchema>;
 
 export default function RegisterPage() {
+  const { data: session } = useSession();
   const router = useRouter();
   const { apiCall } = useApiToast();
+
+  // 🔒 SECURITY: Redirect logged-in users away from register page
+  useEffect(() => {
+    if (session?.user) {
+      console.log("🔒 SECURITY: Logged-in user redirected from register page");
+      router.push("/");
+      return;
+    }
+  }, [session, router]);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
