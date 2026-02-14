@@ -16,11 +16,30 @@ interface Spot {
   amenities: string[];
 }
 
+interface Review {
+  _id: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  userId?: {
+    name?: string;
+  };
+}
+
+interface ReviewsData {
+  reviews: Review[];
+  totalReviews: number;
+  averageRating: number;
+}
+
 export default function SpotPage() {
   const { id } = useParams();
   const router = useRouter();
   const { data: session } = useSession();
   const [spot, setSpot] = useState<Spot | null>(null);
+  const [reviewsData, setReviewsData] = useState<ReviewsData | null>(null);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewsError, setReviewsError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
 
@@ -41,6 +60,53 @@ export default function SpotPage() {
       })
       .finally(() => setLoading(false));
   }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    setReviewsError(null);
+    setReviewsLoading(true);
+    fetch(`/api/reviews?spotId=${id}`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (data?.success) setReviewsData(data.data);
+        else setReviewsData(null);
+      })
+      .catch((error) => {
+        console.error("Error fetching reviews:", error);
+        setReviewsData(null);
+        setReviewsError("Unable to load reviews at this time.");
+      })
+      .finally(() => setReviewsLoading(false));
+  }, [id]);
+
+  const renderStars = (rating: number) => {
+    const r = Math.round(rating);
+    return (
+      <div className="flex">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            className={star <= r ? "text-yellow-400" : "text-gray-300"}
+          >
+            ★
+          </span>
+        ))}
+      </div>
+    );
+  };
+
+  const formatDate = (dateString: string) => {
+    const d = new Date(dateString);
+    if (Number.isNaN(d.getTime())) return "";
+    return d.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
 
   const handleApply = async () => {
     if (!session?.user) {
@@ -137,6 +203,91 @@ export default function SpotPage() {
               >
                 {applying ? "Applying..." : "Apply for this Spot"}
               </button>
+
+              <div className="mt-10">
+                <h2 className="text-2xl font-bold mb-4 text-gray-900">
+                  Reviews & Ratings
+                </h2>
+
+                {reviewsLoading ? (
+                  <div className="text-gray-600">Loading reviews...</div>
+                ) : reviewsData ? (
+                  <>
+                    <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-6">
+                      <div className="flex items-center gap-4">
+                        <div className="text-center">
+                          <div className="text-3xl font-bold text-yellow-600">
+                            {reviewsData.averageRating ?? 0}
+                          </div>
+                          <div className="flex justify-center">
+                            {renderStars(reviewsData.averageRating ?? 0)}
+                          </div>
+                          <div className="text-sm text-gray-600 mt-1">
+                            {reviewsData.totalReviews ?? 0} review
+                            {(reviewsData.totalReviews ?? 0) === 1 ? "" : "s"}
+                          </div>
+                        </div>
+                        <div className="flex-1 text-sm text-gray-600">
+                          Average rating from {reviewsData.totalReviews ?? 0}{" "}
+                          visitor
+                          {(reviewsData.totalReviews ?? 0) === 1 ? "" : "s"}
+                        </div>
+                      </div>
+                    </div>
+
+                    {reviewsData.reviews?.length ? (
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          Recent Reviews
+                        </h3>
+                        {reviewsData.reviews.map((review) => {
+                          const reviewerName =
+                            review.userId?.name?.trim() || "Anonymous";
+                          const initial = reviewerName
+                            ? reviewerName.charAt(0).toUpperCase()
+                            : "A";
+                          return (
+                            <div
+                              key={review._id}
+                              className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm"
+                            >
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                                    {initial}
+                                  </div>
+                                  <div>
+                                    <div className="font-medium text-gray-900">
+                                      {reviewerName}
+                                    </div>
+                                    <div className="text-sm text-gray-500">
+                                      {formatDate(review.createdAt)}
+                                    </div>
+                                  </div>
+                                </div>
+                                {renderStars(review.rating)}
+                              </div>
+                              <p className="text-gray-700 mt-3">
+                                {review.comment}
+                              </p>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        <p>
+                          No reviews yet. Be the first to review after visiting!
+                        </p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>{reviewsError ?? "No reviews available."}</p>
+                  </div>
+                )}
+              </div>
             </div>
           </>
         ) : (

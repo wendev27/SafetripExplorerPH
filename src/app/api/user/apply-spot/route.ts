@@ -5,7 +5,6 @@ import { z } from "zod";
 import mongoose from "mongoose";
 import { authOptions } from "../../auth/[...nextauth]/route";
 import UserApplication from "@/services/models/UserApplication";
-import { useApiToast } from "@/hooks/use-api-toast";
 
 // SECURITY: Schema for user spot applications.
 const applySpotSchema = z.object({
@@ -57,32 +56,18 @@ export async function POST(req: Request) {
       });
     }
 
-    const { apiCall } = useApiToast();
+    // Create new application directly
+    const newApp = await UserApplication.create({
+      spotId,
+      userId: session.user.id,
+      status: "pending",
+    });
 
-    const result = await apiCall(
-      async () => {
-        const newApp = await UserApplication.create({
-          spotId,
-          userId: session.user.id,
-          status: "pending",
-        });
-
-        return newApp;
-      },
-      {
-        successMessage: "Application submitted successfully!",
-        errorMessage: "Failed to submit application. Please try again.",
-      },
-    );
-
-    if (result) {
-      return NextResponse.json({ success: true, data: result });
-    } else {
-      return NextResponse.json({
-        success: false,
-        message: "Application failed",
-      });
-    }
+    return NextResponse.json({
+      success: true,
+      data: newApp,
+      message: "Application submitted successfully!",
+    });
   } catch (err) {
     console.error("Error creating application:", err);
     return NextResponse.json(
