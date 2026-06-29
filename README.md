@@ -1,38 +1,232 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛡️ SafeTrip Explorer PH
 
-## Getting Started
+**Security-Focused Full-Stack Web Application**
+**Next.js • TypeScript • PostgreSQL • Prisma**
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 📖 Overview
+
+SafeTrip Explorer PH is a security-focused full-stack web application developed as part of our **Information Security** course.
+
+Rather than focusing only on application features, this project was created to explore, implement, and evaluate modern web security concepts commonly used in secure software development.
+
+Throughout development, we practiced secure authentication, authorization, session management, token-based security, secure API design, and common web security defenses while performing vulnerability assessments using OWASP testing tools.
+
+The primary objective of this project was to better understand how secure web applications are designed, how common web vulnerabilities can be mitigated, and how security should be considered throughout the software development lifecycle.
+
+---
+
+# 🎯 Project Objectives
+
+The objectives of this project were to:
+
+* Practice secure authentication and authorization techniques.
+* Implement modern JWT-based session management.
+* Explore secure token lifecycle management.
+* Apply secure password handling techniques.
+* Learn Role-Based Access Control (RBAC).
+* Protect web applications against common attack vectors.
+* Perform vulnerability assessment using OWASP ZAP.
+* Gain practical experience designing security-aware web applications.
+
+---
+
+# 🔐 Security Concepts Practiced
+
+## Authentication
+
+* JWT Authentication
+* Access Tokens
+* Refresh Tokens
+* Refresh Token Rotation
+* HTTP-only Cookies
+* Secure Login & Logout
+* Protected Routes
+
+---
+
+## Authorization
+
+* Role-Based Access Control (RBAC)
+* Protected API Endpoints
+* Permission Validation
+
+---
+
+## Session Management
+
+* Refresh Token Storage
+* Session Tracking
+* Device Information
+* Token Expiration
+* Session Lifecycle Management
+
+---
+
+## Secure Password Handling
+
+* Password Hashing
+* Password Verification
+* No Plain-Text Password Storage
+
+---
+
+## Input Validation
+
+* Server-side Validation
+* Request Validation
+* Email Validation
+* Password Validation
+
+---
+
+## Web Security
+
+* CSRF Protection
+* HTTP Security Headers
+* Secure Cookie Management
+* OWASP Top 10 Awareness
+
+---
+
+## Security Testing
+
+* OWASP ZAP Vulnerability Assessment
+* Authentication Flow Testing
+* Security Header Verification
+* Protected Endpoint Testing
+
+---
+
+# 🛠️ Technologies Used
+
+## Frontend
+
+* Next.js
+* React
+* TypeScript
+* Tailwind CSS
+
+## Backend
+
+* Next.js API Routes
+* Prisma ORM
+
+## Database
+
+* PostgreSQL
+
+## Authentication
+
+* JWT
+* HTTP-only Cookies
+
+## Security
+
+* OWASP ZAP
+* Role-Based Access Control (RBAC)
+* Refresh Token Rotation
+
+---
+
+# 🏗️ Authentication Flow
+
+```text
+User Registration
+        │
+        ▼
+Password Hashing
+        │
+        ▼
+User Login
+        │
+        ▼
+Credential Verification
+        │
+        ▼
+Generate Access Token
+        │
+        ▼
+Generate Refresh Token
+        │
+        ▼
+Store Refresh Token
+        │
+        ▼
+HTTP-only Cookie
+        │
+        ▼
+Authenticated Requests
+        │
+        ▼
+Access Token Expires
+        │
+        ▼
+Refresh Token Validation
+        │
+        ▼
+Issue New Access Token
+        │
+        ▼
+Continue Secure Session
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# 🧪 Security Evaluation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+As part of the project, we explored and evaluated several security mechanisms commonly found in modern web applications.
 
-## Learn More
+Testing activities included:
 
-To learn more about Next.js, take a look at the following resources:
+* Authentication flow validation
+* Authorization testing
+* Protected endpoint verification
+* Security header inspection
+* Basic vulnerability assessment using OWASP ZAP
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The objective was to understand how these security controls work together and identify areas for improvement during development.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+# 📚 Lessons Learned
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Developing this project significantly improved my understanding of secure web application development.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# SafetripExplorerPH
-# SafetripExplorerPH
+Some of the key lessons learned include:
+
+* Authentication is more than simply implementing a login page.
+* Authorization should always be separated from authentication.
+* Session management plays a critical role in application security.
+* Secure software should be designed with security considerations from the beginning rather than adding them after development.
+* Security testing is an important part of the software development lifecycle.
+
+This project also reinforced the importance of understanding how different security mechanisms work together to reduce common web application risks.
+
+---
+
+# 🚧 Project Scope
+
+This project was developed primarily for educational purposes as part of an Information Security course.
+
+The implementation focuses on practicing and understanding secure software development concepts rather than claiming production-level security.
+
+Future improvements could include:
+
+* Multi-Factor Authentication (MFA)
+* Rate Limiting
+* Account Lockout Policies
+* Content Security Policy (CSP)
+* Audit Logging
+* Automated Security Testing
+* Security Monitoring
+* Refresh Token Revocation Lists
+
+---
+
+# 📌 Current Status
+
+🎓 **Information Security Course Project**
+
+SafeTrip Explorer PH demonstrates the practical application of modern authentication, authorization, secure session management, and web security concepts within a full-stack web application developed for academic and learning purposes.
