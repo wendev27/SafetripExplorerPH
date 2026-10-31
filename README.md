@@ -1,7 +1,7 @@
 # 🛡️ SafeTrip Explorer PH
 
 **Security-Focused Full-Stack Web Application**
-**Next.js • TypeScript • PostgreSQL • Prisma**
+**Next.js • TypeScript • PostgreSQL **
 
 ---
 
@@ -111,7 +111,6 @@ The objectives of this project were to:
 ## Backend
 
 * Next.js API Routes
-* Prisma ORM
 
 ## Database
 
